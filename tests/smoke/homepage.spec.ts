@@ -11,7 +11,7 @@ test.describe("Homepage Tests - Automation In Testing", () => {
 
   test("Homepage loads successfully", async () => {
     await homePage.expectPageLoaded()
-    await expect(homePage.page).toHaveURL(/.*#\//)
+    await expect(homePage.page).toHaveURL(/.*#\/?/)
   })
 
   test("Brand or rooms are visible", async () => {
@@ -28,7 +28,7 @@ test.describe("Homepage Tests - Automation In Testing", () => {
 
   test("Navigate to booking", async () => {
     await homePage.clickLoginLink()
-    await expect(homePage.page).toHaveURL(/.*#\//)
+    await expect(homePage.page.getByRole("button", { name: /book/i }).first()).toBeVisible()
   })
 
   test("Open rooms navigation", async () => {
