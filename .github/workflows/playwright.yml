@@ -1,0 +1,147 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 3 * * *'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest ]
+        node: [ 18, 20 ]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Cache Playwright browsers (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+          restore-keys: ${{ runner.os }}-playwright-
+
+      - name: Cache Playwright browsers (Windows)
+        if: matrix.os == 'windows-latest'
+        uses: actions/cache@v4
+        with:
+          path: C:\Users\runneradmin\AppData\Local\ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+          restore-keys: ${{ runner.os }}-playwright-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: npx playwright install --with-deps
+
+      - name: Install Playwright Browsers
+        if: matrix.os != 'ubuntu-latest'
+        run: npx playwright install
+
+      - name: Run Playwright tests
+        env:
+          EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
+          EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          TEAMS_WEBHOOK: ${{ secrets.TEAMS_WEBHOOK }}
+        run: npx playwright test
+
+      - name: Upload HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports-${{ matrix.os }}-node${{ matrix.node }}
+          path: reports/html
+          retention-days: 30
+
+      - name: Upload JSON report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-json-${{ matrix.os }}-node${{ matrix.node }}
+          path: reports/report.json
+          retention-days: 30
+
+      - name: Setup Java for Allure
+        if: always()
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Generate Allure report
+        if: always()
+        run: |
+          npx allure generate --clean allure-results -o reports/allure
+
+      - name: Upload Allure HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-${{ matrix.os }}-node${{ matrix.node }}
+          path: reports/allure
+          retention-days: 30
+
+  performance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run k6 performance test
+        uses: grafana/k6-action@v0.2.0
+        with:
+          filename: performance/basic.k6.js
+          flags: --summary-export=reports/k6-summary.json
+        env:
+          BASE_URL: ${{ vars.BASE_URL || secrets.BASE_URL || 'https://automationteststore.com/' }}
+      - name: Upload k6 summary HTML
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-summary-html
+          path: reports/k6-summary.html
+      - name: Upload k6 summary JSON
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-summary-json
+          path: reports/k6-summary.json
+
+      - name: Send notifications
+        if: always()
+        env:
+          EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
+          EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
+          TEAMS_WEBHOOK: ${{ secrets.TEAMS_WEBHOOK }}
+          REPORT_JSON_PATH: reports/report.json
+        run: |
+          node --loader ts-node/esm scripts/sendAllNotifications.ts

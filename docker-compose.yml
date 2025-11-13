@@ -1,0 +1,30 @@
+services:
+  tests:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - ./reports:/app/reports
+    command: ["npx", "playwright", "test"]
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    restart: always
+    ports:
+      - "9443:9443"
+      - "8000:8000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+  k6:
+    image: grafana/k6:latest
+    environment:
+      - BASE_URL=${BASE_URL:-https://automationteststore.com/}
+    volumes:
+      - ./performance:/scripts
+      - ./reports:/reports
+    command: ["run", "--summary-export=/reports/k6-summary.json", "/scripts/basic.k6.js"]
+
+volumes:
+  portainer_data:

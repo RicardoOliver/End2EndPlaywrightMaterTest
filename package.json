@@ -1,0 +1,49 @@
+{
+  "name": "playwright-test-framework",
+  "version": "1.0.1",
+  "description": "Framework completo de testes E2E com Playwright para Automation Test Store",
+  "type": "module",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "test:ui": "npx playwright test --ui",
+    "test:debug": "npx playwright test --debug",
+    "test:report": "npx playwright show-report reports/html",
+    "test:chrome": "npx playwright test --project=chromium",
+    "test:firefox": "npx playwright test --project=firefox",
+    "test:webkit": "npx playwright test --project=webkit",
+    "test:e2e": "npx playwright test tests/e2e",
+    "test:smoke": "npx playwright test tests/smoke",
+    "test:api": "npx playwright test tests/api",
+    "test:login": "npx playwright test tests/e2e/login.spec.ts",
+    "test:shopping": "npx playwright test tests/e2e/shopping.spec.ts",
+    "test:checkout": "npx playwright test tests/e2e/checkout.spec.ts",
+    "test:fast": "set FAST=true&& npx playwright test",
+    "test:parallel": "npx playwright test --workers=4",
+    "test:serial": "npx playwright test --workers=1",
+    "codegen": "npx playwright codegen https://automationteststore.com/",
+    "install:browsers": "npx playwright install",
+    "notify": "node --loader ts-node/esm scripts/sendAllNotifications.ts",
+    "report:allure": "allure generate --clean allure-results -o reports/allure",
+    "report:allure:open": "allure open reports/allure",
+    "perf:k6": "docker compose run --rm k6"
+  },
+  "dependencies": {
+    "@slack/web-api": "latest",
+    "dotenv": "^16.4.5",
+    "nodemailer": "^6.9.15",
+    "archiver": "^6.0.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.41.0",
+    "@types/node": "^22",
+    "@types/nodemailer": "^6.4.16",
+    "typescript": "^5",
+    "allure-playwright": "^2.0.0",
+    "allure-commandline": "^2.18.0",
+    "ts-node": "^10.9.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
