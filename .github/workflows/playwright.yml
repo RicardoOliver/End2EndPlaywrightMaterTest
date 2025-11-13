@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, windows-latest ]
+        os: [ ubuntu-latest ]
         node: [ 20, 22 ]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
@@ -190,3 +190,64 @@ jobs:
           path: reports/report.json
           if-no-files-found: warn
           retention-days: 7
+
+  test_windows_scheduled:
+    if: ${{ github.event_name == 'schedule' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ windows-latest ]
+        node: [ 20, 22 ]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Cache Playwright browsers (Windows)
+        uses: actions/cache@v4
+        with:
+          path: C:\Users\runneradmin\AppData\Local\ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+          restore-keys: ${{ runner.os }}-playwright-
+      - name: Install dependencies
+        run: npm ci || npm install --no-fund --no-audit
+      - name: Install Playwright Browsers
+        run: npx playwright install
+      - name: Run Playwright tests (Windows scheduled)
+        run: npx playwright test --max-failures=1
+      - name: Setup Java for Allure
+        if: always()
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Generate Allure report
+        if: always()
+        run: |
+          npx allure-commandline generate allure-results -o reports/allure --clean
+      - name: Upload HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-reports-html-node${{ matrix.node }}
+          path: reports/html
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Upload JSON report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-report-json-node${{ matrix.node }}
+          path: reports/report.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Upload Allure HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-allure-node${{ matrix.node }}
+          path: reports/allure
+          if-no-files-found: warn
+          retention-days: 30
