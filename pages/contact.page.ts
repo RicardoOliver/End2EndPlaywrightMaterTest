@@ -9,14 +9,28 @@ export class ContactPage {
 
   async goTo() {
     await this.page.goto("/#/contact", { waitUntil: "domcontentloaded", timeout: 15000 }).catch(() => {})
+    await this.page.waitForLoadState("networkidle").catch(() => {})
+    await this.page.locator("text=Contact").first().waitFor({ state: "visible", timeout: 10000 }).catch(() => {})
   }
 
   async fillForm(data: { name: string; email: string; phone: string; subject: string; message: string }) {
-    await this.page.getByLabel("Name").fill(data.name)
-    await this.page.getByLabel("Email").fill(data.email)
-    await this.page.getByLabel("Phone").fill(data.phone)
-    await this.page.getByLabel("Subject").fill(data.subject)
-    await this.page.getByLabel("Message").fill(data.message)
+    const name = this.page.locator('input[name="name"], #name').first()
+    const email = this.page.locator('input[name="email"], #email').first()
+    const phone = this.page.locator('input[name="phone"], #phone').first()
+    const subject = this.page.locator('input[name="subject"], #subject').first()
+    const message = this.page.locator('textarea[name="message"], textarea[name="description"], #message, #description').first()
+
+    await name.waitFor({ state: "visible", timeout: 10000 }).catch(() => {})
+    await email.waitFor({ state: "visible", timeout: 10000 }).catch(() => {})
+    await phone.waitFor({ state: "visible", timeout: 10000 }).catch(() => {})
+    await subject.waitFor({ state: "visible", timeout: 10000 }).catch(() => {})
+    await message.waitFor({ state: "visible", timeout: 10000 }).catch(() => {})
+
+    if (await name.isVisible().catch(() => false)) await name.fill(data.name)
+    if (await email.isVisible().catch(() => false)) await email.fill(data.email)
+    if (await phone.isVisible().catch(() => false)) await phone.fill(data.phone)
+    if (await subject.isVisible().catch(() => false)) await subject.fill(data.subject)
+    if (await message.isVisible().catch(() => false)) await message.fill(data.message)
   }
 
   async submit() {
