@@ -305,6 +305,40 @@ jobs:
           git commit -m "docs(media): update demo video from latest push run" || true
           git push || true
 
+  record_demo_video_push:
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install deps and browsers
+        run: |
+          npm ci || npm install --no-fund --no-audit
+          npx playwright install --with-deps
+      - name: Run demo test with video
+        env:
+          PW_FAST: false
+          PW_VIDEO: on
+        run: |
+          npx playwright test tests/smoke/homepage.spec.ts --project=chromium -g "Homepage loads successfully" || true
+      - name: Convert latest demo webm to mp4
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg || true
+          mkdir -p docs/media
+          FILE=$(ls -t test-results/**/*.webm 2>/dev/null | head -n1 || true)
+          if [ -n "$FILE" ]; then
+            ffmpeg -y -i "$FILE" -c:v libx264 -preset ultrafast -c:a aac docs/media/demo.mp4 || true
+          fi
+      - name: Commit demo video
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add docs/media/demo.mp4 || true
+          git commit -m "docs(media): update demo.mp4 from recorded demo test" || true
+          git push || true
+
       - name: Send notifications (Playwright only)
         if: false
         run: echo "Notifications disabled for performance job"

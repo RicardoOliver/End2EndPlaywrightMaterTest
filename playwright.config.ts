@@ -18,9 +18,10 @@ const fastMode = process.env.FAST === "true" || process.env.PW_FAST === "true"
 const useDefaults = {
   headless: true,
   screenshot: fastMode ? "off" : "only-on-failure",
-  video: fastMode ? "off" : "retain-on-failure",
+  video: process.env.PW_VIDEO === "on" ? "on" : fastMode ? "off" : "retain-on-failure",
   trace: fastMode ? "off" : "retain-on-failure",
   baseURL: process.env.BASE_URL || "https://automationintesting.online/",
+  outputDir: "test-results",
 } as const
 
 export default defineConfig({
