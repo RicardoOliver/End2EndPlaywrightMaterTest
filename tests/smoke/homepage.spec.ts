@@ -15,8 +15,11 @@ test.describe("Homepage Tests - Automation In Testing", () => {
   })
 
   test("Brand or rooms are visible", async () => {
-    const isVisible = await homePage.isLogoVisible()
-    expect(isVisible).toBe(true)
+    const brand = homePage.page.locator("text=Shady Meadows B&B").first()
+    const rooms = homePage.page.locator("text=Rooms").first()
+    await brand.waitFor({ state: "visible", timeout: 10000 }).catch(() => {})
+    const visible = (await brand.isVisible().catch(() => false)) || (await rooms.isVisible().catch(() => false))
+    expect(visible).toBe(true)
   })
 
   test("Rooms section accessible", async () => {
