@@ -113,6 +113,11 @@ Se configurado corretamente, você receberá um email em **r.c.d.1985@hotmail.co
 - Link para o relatório
 - Anexo ZIP com relatório HTML quando disponível
 
+### Observação sobre FAST mode
+
+- Quando `PW_FAST=true` (ou `FAST=true`) no ambiente, o teardown global pula o envio de notificações para acelerar a execução.
+- O arquivo `.env` é carregado a partir da raiz do projeto pelo `global-teardown.ts`.
+
 ---
 
 ## 🐛 Solução de Problemas

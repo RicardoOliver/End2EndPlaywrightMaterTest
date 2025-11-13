@@ -8,34 +8,28 @@ Framework completo de testes E2E com Playwright para o site [Automation In Testi
 playwright-framework/
 ├─ tests/
 │  ├─ e2e/              # Testes End-to-End
-│  │  ├─ login.spec.ts
-│  │  ├─ shopping.spec.ts
-│  │  ├─ product-search.spec.ts
-│  │  └─ checkout.spec.ts
+│  │  ├─ contact.spec.ts
+│  │  └─ booking.spec.ts
 │  ├─ smoke/            # Testes de Smoke
-│  │  ├─ homepage.spec.ts
-│  │  └─ navigation.spec.ts
-│  ├─ api/              # Testes de API
+│  │  └─ homepage.spec.ts
+│  ├─ regression/       # Testes regressivos
+│  │  └─ site-regression.spec.ts
+│  ├─ api/              # Testes de API/Health
 │  │  └─ products.spec.ts
-│  └─ examples/         # Exemplos avançados
+│  └─ nonfunctional/    # Testes não funcionais
+│     └─ headers.spec.ts
 ├─ pages/               # Page Object Models
-│  ├─ login.page.ts
 │  ├─ homepage.page.ts
-│  ├─ product.page.ts
-│  ├─ cart.page.ts
-│  └─ checkout.page.ts
-├─ components/          # Componentes reutilizáveis
-│  └─ navbar.component.ts
+│  ├─ contact.page.ts
+│  └─ booking.page.ts
 ├─ fixtures/            # Dados de teste
-│  ├─ users.json
-│  └─ checkout.json
+│  ├─ contact.json
+│  ├─ k6-message.json
+│  └─ message-invalid.json
 ├─ utils/               # Utilitários (API helpers)
 ├─ notifiers/           # Sistema de notificações
-│  ├─ emailNotifier.ts
-│  ├─ slackNotifier.ts
-│  ├─ teamsNotifier.ts
-│  ├─ metrics.ts
-│  └─ notifyResults.ts
+│  ├─ notifyResults.ts
+│  └─ email/slack/teams helpers
 └─ reports/             # Relatórios HTML e JSON
 ```
 
@@ -96,17 +90,14 @@ npx playwright test --debug
 ## 🎯 Testes Disponíveis
 
 ### E2E Tests (End-to-End)
-- **login.spec.ts**: Autenticação com credenciais válidas/inválidas
-- **shopping.spec.ts**: Fluxo completo de compras (busca → carrinho → checkout)
-- **product-search.spec.ts**: Busca e navegação por produtos
-- **checkout.spec.ts**: Processo de finalização de compra
+- **contact.spec.ts**: Envio do formulário de contato
+- **booking.spec.ts**: Abertura do fluxo de reserva e validação do botão Book
 
 ### Smoke Tests
-- **homepage.spec.ts**: Validação de elementos principais da homepage
-- **navigation.spec.ts**: Navegação entre categorias e páginas
+- **homepage.spec.ts**: Validação de elementos principais e navegação básica
 
-### API Tests
-- **products.spec.ts**: Validação de endpoints de produtos e categorias
+### API/Health Tests
+- **products.spec.ts**: Health de `/#/` e `#/contact`
 
 ## 📊 Relatórios
 
@@ -143,7 +134,7 @@ Pipeline GitHub Actions configurado em `.github/workflows/playwright.yml`
 - 🔔 Notificações automáticas após execução
 
 ### Jobs
-- `test`: matriz de SO/Node, cache de browsers, upload de relatórios (HTML/JSON/Allure/JUnit)
+- `test`: matriz de SO/Node, shard, artefatos com nomes únicos por shard, comentário automático em PR ao falhar e criação de issue em push quando falha
 - `performance`: executa k6 e publica `reports/k6-summary.html` e `reports/k6-summary.json`
 
 ### Variáveis/Secrets recomendados
@@ -191,10 +182,13 @@ test('Meu teste', async ({ page }) => {
 - Build: `docker build -t e2e-playwright .`
 - Testes via compose: `docker compose run --rm tests`
 - Portainer (opcional): gerencie containers via UI usando serviço definido em `docker-compose.yml`
+- Métricas de performance: `docker compose up -d influxdb grafana` e `npm run perf:k6` (k6 envia para InfluxDB e visualização no Grafana em `http://localhost:3000`)
 
 ## ⚡ Performance (k6)
 
 - Local via Docker: `npm run perf:k6`
+- Cenários: `home`, `contact`, `roomsSection`, `message`
+- Saídas: `reports/k6-summary.json`, `reports/k6-summary.html` e métricas em InfluxDB (opcional)
 - CI: job `performance` publica artefatos em Actions
 
 ## 📈 Allure
@@ -207,16 +201,12 @@ test('Meu teste', async ({ page }) => {
 
 **Automation In Testing**: https://automationintesting.online/
 
-Site de demonstração para prática de automação de testes com:
-- Sistema de login/registro
-- Catálogo de produtos
-- Carrinho de compras
-- Processo de checkout
-- Múltiplas categorias
+Site de demonstração (Shady Meadows B&B) com:
+- Homepage e navegação por `Rooms`
+- Fluxo “Make a booking”
+- Página `Contact` com formulário
 
 ## 📚 Documentação Adicional
 
-- [SETUP.md](./SETUP.md) - Guia detalhado de instalação
-- [CONTRIBUTING.md](./CONTRIBUTING.md) - Como contribuir
 - [CHANGELOG.md](./CHANGELOG.md) - Histórico de versões
-- [QUICK_START.md](./QUICK_START.md) - Início rápido
+- [CONFIGURACAO_EMAIL.md](./CONFIGURACAO_EMAIL.md) - Configuração de email e comportamento do teardown

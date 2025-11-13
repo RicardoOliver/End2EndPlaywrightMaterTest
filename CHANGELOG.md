@@ -80,15 +80,23 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - dotenv: ^16.0.0
 - typescript: ^5.2.0
 
-## [Unreleased]
+## [1.2.0] - 2025-11-13
 
-### Planejado
-- Testes de API
-- Testes de performance
-- Integração com Allure Report
-- Suporte para testes visuais
-- Integração com BrowserStack/Sauce Labs
-- Custom fixtures avançados
-- Testes de acessibilidade
-- Geração automática de dados de teste
+### Added
+- Pages: `ContactPage`, `BookingPage`
+- Testes: `tests/e2e/contact.spec.ts`, `tests/e2e/booking.spec.ts`
+- Teste não funcional: `tests/nonfunctional/headers.spec.ts`
+- Cenário k6 `roomsSection`
+- Stack local de performance: `influxdb` + `grafana` no `docker-compose.yml`
+
+### Changed
+- Migração completa para `automationintesting.online` com rotas `#`/`#/`
+- Estrutura de testes atualizada (remoção de specs antigos e componentes)
+- CI: nomes de artefatos únicos por shard e etapa de sanitização do shard (`SHARD_NAME`) via `sed`
+- Comentário automático em PR ao falhar e criação de issue em push quando falha
+
+### Fixed
+- Flakiness em navegação de booking e contato com esperas explícitas e seletores resilientes
+- Falha de nome inválido de artefatos (barra `/` no shard)
+- Falhas de contrato da API `/message` variando status (200/201/400/422)
 </merged_code
