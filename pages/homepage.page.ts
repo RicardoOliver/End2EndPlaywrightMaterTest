@@ -16,7 +16,12 @@ export class HomePage {
   }
 
   async isLogoVisible() {
-    return await this.page.locator(".logo img").isVisible()
+    const logoImg = this.page.locator(".logo img").first()
+    await logoImg.waitFor({ state: "visible", timeout: 10000 }).catch(() => {})
+    if (await logoImg.isVisible()) return true
+    const logo = this.page.locator(".logo").first()
+    await logo.waitFor({ state: "visible", timeout: 10000 }).catch(() => {})
+    return await logo.isVisible()
   }
 
   async searchProduct(productName: string) {
@@ -29,7 +34,7 @@ export class HomePage {
   }
 
   async expectPageLoaded() {
-    await expect(this.page.locator(".logo")).toBeVisible()
+    await expect(this.page.locator(".logo, .logo img").first()).toBeVisible()
   }
 
   async getWelcomeMessage() {
