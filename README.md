@@ -197,6 +197,18 @@ test('Meu teste', async ({ page }) => {
 - Abrir: `npm run report:allure:open`
 - Requer Java instalado no ambiente
 
+## 🎬 Mídias (Vídeos e Imagens)
+
+- Vídeos dos testes
+  - Os vídeos são anexados nos artefatos do GitHub Actions em `test-results` quando há falhas.
+  - Para demonstrar no repositório, adicione um vídeo em `docs/media/demo.mp4` e use o link:
+    - [Assista ao vídeo de demonstração](docs/media/demo.mp4)
+
+- Dashboard Grafana (Performance)
+  - Após executar `docker compose up -d influxdb grafana` e `npm run perf:k6`, capture o painel e salve em `docs/media/grafana-dashboard.png`.
+  - Visualização no README:
+    - ![Grafana Dashboard](docs/media/grafana-dashboard.png)
+
 ## 🌐 Site Testado
 
 **Automation In Testing**: https://automationintesting.online/
