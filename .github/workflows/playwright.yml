@@ -247,7 +247,12 @@ jobs:
       - name: Screenshot k6 summary to PNG
         run: |
           mkdir -p docs/media
-          if [ -f reports/k6-summary.html ]; then
+          HTML="reports/k6-summary.html"
+          if [ ! -f "$HTML" ] && [ -f "k6-summary-html/reports/k6-summary.html" ]; then
+            mkdir -p reports
+            cp "k6-summary-html/reports/k6-summary.html" "$HTML"
+          fi
+          if [ -f "$HTML" ]; then
             npm ci || npm install --no-fund --no-audit
             npx playwright install chromium
             node -e '
@@ -268,6 +273,36 @@ jobs:
           git config user.email github-actions@github.com
           git add docs/media/grafana-dashboard.png || true
           git commit -m "docs(media): update Grafana-style performance image from k6 summary" || true
+          git push || true
+
+  update_media_video_push:
+    if: ${{ github.event_name == 'push' }}
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download all test results artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: test-results-*
+          merge-multiple: true
+          path: all_results
+      - name: Find and convert latest video to MP4
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg || true
+          mkdir -p docs/media
+          FILE=$(ls -t all_results/**/*.webm 2>/dev/null | head -n1 || true)
+          if [ -n "$FILE" ]; then
+            ffmpeg -y -i "$FILE" -c:v libx264 -preset ultrafast -c:a aac docs/media/demo.mp4 || true
+          fi
+      - name: Commit media updates (push)
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add docs/media/demo.mp4 || true
+          git commit -m "docs(media): update demo video from latest push run" || true
           git push || true
 
       - name: Send notifications (Playwright only)
