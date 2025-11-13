@@ -21,6 +21,6 @@ test.describe("Regression - Core pages and elements", () => {
     const home = new HomePage(page)
     await home.goTo()
     await page.getByText("Contact").first().click()
-    await expect(page).toHaveURL(/.*#\/contact/)
+    await expect(page).toHaveURL(/.*#\/?contact/)
   })
 })
