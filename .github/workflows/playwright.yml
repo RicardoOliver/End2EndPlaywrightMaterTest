@@ -14,6 +14,8 @@ concurrency:
 
 permissions:
   contents: read
+  issues: write
+  pull-requests: write
 
 jobs:
   test:
@@ -103,6 +105,40 @@ jobs:
           path: test-results
           if-no-files-found: warn
           retention-days: 30
+
+      - name: Create failure issue (main/develop)
+        if: failure() && github.event_name != 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs')
+            const p = 'reports/report.json'
+            let body = 'Playwright job failed on ' + context.ref + "\n\n"
+            if (fs.existsSync(p)) {
+              const data = JSON.parse(fs.readFileSync(p, 'utf8'))
+              const suites = Array.isArray(data.suites) ? data.suites : []
+              const failures = []
+              for (const s of suites) {
+                const specs = Array.isArray(s.specs) ? s.specs : []
+                for (const sp of specs) {
+                  if (sp.ok === false) failures.push(sp)
+                }
+              }
+              const lines = failures.map(f => `• ${f.title} (${f.file || 'unknown file'})`)
+              body += failures.length > 0
+                ? `Falhas (${failures.length}):\n${lines.join('\n')}\n\nArtefatos anexados: HTML, JSON e test-results.`
+                : 'Falha detectada, mas nenhum teste quebrado identificado no JSON.'
+            } else {
+              body += 'report.json não encontrado.'
+            }
+            const title = `CI falhou: ${context.runId}`
+            const res = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+            })
+            core.info(`Issue criada #${res.data.number}`)
 
       - name: Setup Java for Allure
         if: always()
