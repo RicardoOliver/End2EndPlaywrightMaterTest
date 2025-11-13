@@ -25,8 +25,15 @@ export default function () {
 }
 
 export function handleSummary(data) {
+  const summary = data && typeof data === 'object' ? data : { metrics: {}, root_group: { name: 'summary' } }
+  let html
+  try {
+    html = htmlReport(summary)
+  } catch (e) {
+    html = `<html><body><pre>${JSON.stringify(summary, null, 2)}</pre></body></html>`
+  }
   return {
-    'reports/k6-summary.html': htmlReport(data),
-    'reports/k6-summary.json': JSON.stringify(data, null, 2),
+    'reports/k6-summary.html': html,
+    'reports/k6-summary.json': JSON.stringify(summary, null, 2),
   }
 }
