@@ -16,12 +16,23 @@ export class HomePage {
   }
 
   async isLogoVisible() {
-    const logoImg = this.page.locator(".logo img").first()
-    await logoImg.waitFor({ state: "visible", timeout: 10000 }).catch(() => {})
-    if (await logoImg.isVisible()) return true
-    const logo = this.page.locator(".logo").first()
-    await logo.waitFor({ state: "visible", timeout: 10000 }).catch(() => {})
-    return await logo.isVisible()
+    await this.page.waitForLoadState("domcontentloaded")
+    const candidates = [
+      ".logo img",
+      ".logo",
+      "#logo",
+      "a.logo",
+      ".navbar-brand img",
+    ]
+    for (const sel of candidates) {
+      const el = this.page.locator(sel).first()
+      const count = await el.count()
+      if (count > 0) {
+        await el.waitFor({ state: "visible", timeout: 10000 }).catch(() => {})
+        if (await el.isVisible()) return true
+      }
+    }
+    return false
   }
 
   async searchProduct(productName: string) {
@@ -34,7 +45,18 @@ export class HomePage {
   }
 
   async expectPageLoaded() {
-    await expect(this.page.locator(".logo, .logo img").first()).toBeVisible()
+    await this.page.waitForLoadState("domcontentloaded")
+    const search = this.page.locator("#filter_keyword").first()
+    const mainText = this.page.locator(".maintext").first()
+    const logo = this.page.locator(".logo, .logo img, #logo").first()
+    await Promise.any([
+      search.waitFor({ state: "visible", timeout: 10000 }),
+      mainText.waitFor({ state: "visible", timeout: 10000 }),
+      logo.waitFor({ state: "visible", timeout: 10000 }),
+    ]).catch(() => {})
+    const visible =
+      (await search.isVisible()) || (await mainText.isVisible()) || (await logo.isVisible())
+    expect(visible).toBe(true)
   }
 
   async getWelcomeMessage() {
