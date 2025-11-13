@@ -95,6 +95,15 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
 
+      - name: Upload raw test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}-node${{ matrix.node }}
+          path: test-results
+          if-no-files-found: warn
+          retention-days: 30
+
       - name: Setup Java for Allure
         if: always()
         uses: actions/setup-java@v4
@@ -192,6 +201,46 @@ jobs:
           path: reports/report.json
           if-no-files-found: warn
           retention-days: 7
+
+      - name: Upload raw test results (smoke)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-test-results
+          path: test-results
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Comment failure summary on PR
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs')
+            const p = 'reports/report.json'
+            if (!fs.existsSync(p)) {
+              core.warning('report.json not found')
+              return
+            }
+            const data = JSON.parse(fs.readFileSync(p, 'utf8'))
+            const suites = Array.isArray(data.suites) ? data.suites : []
+            const failures = []
+            for (const s of suites) {
+              const specs = Array.isArray(s.specs) ? s.specs : []
+              for (const sp of specs) {
+                if (sp.ok === false) failures.push(sp)
+              }
+            }
+            const lines = failures.map(f => `• ${f.title} (${f.file || 'unknown file'})`)
+            const body = failures.length > 0
+              ? `CI falhou em ${failures.length} teste(s):\n${lines.join('\n')}\n\nArtefatos anexados: HTML, JSON e test-results.`
+              : `CI falhou, mas não foi possível identificar testes a partir do JSON.`
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body,
+            })
 
   test_windows_scheduled:
     if: ${{ github.event_name == 'schedule' }}
