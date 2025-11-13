@@ -14,14 +14,6 @@ const envPath = path.resolve(__dirname, ".env")
 
 console.log(`[Global Teardown] Attempting to load .env from: ${envPath}`)
 console.log(`[Global Teardown] .env file exists: ${fs.existsSync(envPath)}`)
-
-if (!fs.existsSync(envPath)) {
-  console.warn(`⚠️  WARNING: .env file not found at ${envPath}`)
-  console.warn(`⚠️  Please create a .env file in the project root directory`)
-  console.warn(`⚠️  You can copy .env.example to .env and fill in your credentials`)
-}
-
-// Carrega as variáveis de ambiente
 dotenv.config({ path: envPath })
 
 async function globalTeardown() {
