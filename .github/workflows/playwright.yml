@@ -135,7 +135,7 @@ jobs:
           filename: performance/basic.k6.js
           flags: --summary-export=reports/k6-summary.json
         env:
-          BASE_URL: ${{ vars.BASE_URL || secrets.BASE_URL || 'https://automationteststore.com/' }}
+          BASE_URL: ${{ vars.BASE_URL || secrets.BASE_URL || 'https://automationintesting.online/#/' }}
       - name: Upload k6 summary HTML
         if: always()
         uses: actions/upload-artifact@v4

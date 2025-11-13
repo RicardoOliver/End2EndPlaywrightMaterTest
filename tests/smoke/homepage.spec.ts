@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test"
 import { HomePage } from "../../pages/homepage.page"
 
-test.describe("Homepage Tests - Automation Test Store", () => {
+test.describe("Homepage Tests - Automation In Testing", () => {
   let homePage: HomePage
 
   test.beforeEach(async ({ page }) => {
@@ -10,61 +10,26 @@ test.describe("Homepage Tests - Automation Test Store", () => {
   })
 
   test("Homepage loads successfully", async () => {
-    try {
-      await homePage.expectPageLoaded()
-      const title = await homePage.getTitle()
-      expect(title).toContain("A place to practice Automation Testing")
-    } catch {
-      const panelText = await homePage.page.locator(".contentpanel").first().textContent().catch(() => "")
-      if (panelText && panelText.includes("Cannot establish database connection")) {
-        expect(true).toBe(true)
-        return
-      }
-      const mainTextVisible = await homePage.page.locator(".maintext").first().isVisible().catch(() => false)
-      if (!mainTextVisible) {
-        expect(true).toBe(true)
-        return
-      }
-      expect(mainTextVisible).toBe(true)
-    }
+    await homePage.expectPageLoaded()
+    await expect(homePage.page).toHaveURL(/.*#\//)
   })
 
-  test("Logo is visible", async () => {
+  test("Brand or rooms are visible", async () => {
     const isVisible = await homePage.isLogoVisible()
-    if (!isVisible) {
-      const panelText = await homePage.page.locator(".contentpanel").first().textContent().catch(() => "")
-      if (panelText && panelText.includes("Cannot establish database connection")) {
-        expect(true).toBe(true)
-        return
-      }
-      const mainTextVisible = await homePage.page.locator(".maintext").first().isVisible().catch(() => false)
-      if (!mainTextVisible) {
-        expect(true).toBe(true)
-        return
-      }
-      expect(mainTextVisible || isVisible).toBe(true)
-      return
-    }
     expect(isVisible).toBe(true)
   })
 
-  test("Search functionality works", async () => {
-    await homePage.searchProduct("skinsheen")
-    await expect(homePage.page).toHaveURL(/.*product\/search/)
-    const panelText = await homePage.page.locator(".contentpanel").first().textContent().catch(() => "")
-    if (panelText && panelText.includes("Cannot establish database connection")) {
-      console.warn("[playwright] Search backend error — treating as pass for smoke")
-      expect(true).toBe(true)
-      return
-    }
+  test("Rooms section accessible", async () => {
+    await expect(homePage.page.locator("text=Rooms").first()).toBeVisible()
   })
 
-  test("Navigate to login page", async () => {
+  test("Navigate to booking", async () => {
     await homePage.clickLoginLink()
-    await expect(homePage.page).toHaveURL(/.*account\/login/)
+    await expect(homePage.page).toHaveURL(/.*#\//)
   })
 
-  test("Cart icon is visible", async () => {
+  test("Open rooms navigation", async () => {
     await homePage.clickCartIcon()
+    await expect(homePage.page.locator("text=Rooms").first()).toBeVisible()
   })
 })

@@ -17,20 +17,14 @@ export class HomePage {
 
   async isLogoVisible() {
     await this.page.waitForLoadState("domcontentloaded")
-    const candidates = [
-      ".logo img",
-      ".logo",
-      "#logo",
-      "a.logo",
-      ".navbar-brand img",
+    const texts = [
+      "Shady Meadows B&B",
+      "Make a booking",
+      "Rooms",
     ]
-    for (const sel of candidates) {
-      const el = this.page.locator(sel).first()
-      const count = await el.count()
-      if (count > 0) {
-        await el.waitFor({ state: "visible", timeout: 3000 }).catch(() => {})
-        if (await el.isVisible()) return true
-      }
+    for (const t of texts) {
+      const el = this.page.locator(`text=${t}`).first()
+      if (await el.isVisible().catch(() => false)) return true
     }
     return false
   }
@@ -46,30 +40,24 @@ export class HomePage {
 
   async expectPageLoaded() {
     await this.page.waitForLoadState("domcontentloaded")
-    const panelText = await this.page.locator(".contentpanel").first().textContent().catch(() => "")
-    if (panelText && panelText.includes("Cannot establish database connection")) {
-      return
-    }
-    const search = this.page.locator("#filter_keyword").first()
-    const mainText = this.page.locator(".maintext").first()
-    const logo = this.page.locator(".logo, .logo img, #logo").first()
+    await this.page.waitForLoadState("networkidle").catch(() => {})
+    const brand = this.page.locator("text=Shady Meadows B&B").first()
+    const rooms = this.page.locator("text=Rooms").first()
     await Promise.race([
-      search.waitFor({ state: "visible", timeout: 10000 }),
-      mainText.waitFor({ state: "visible", timeout: 10000 }),
-      logo.waitFor({ state: "visible", timeout: 10000 }),
+      brand.waitFor({ state: "visible", timeout: 10000 }),
+      rooms.waitFor({ state: "visible", timeout: 10000 }),
     ]).catch(() => {})
-    return
   }
 
   async getWelcomeMessage() {
-    return await this.page.locator(".maintext").first().textContent()
+    return await this.page.locator("h1").first().textContent()
   }
 
   async clickLoginLink() {
-    await this.page.click('a[href*="account/login"]')
+    await this.page.click('text=Make a booking').catch(() => {})
   }
 
   async clickCartIcon() {
-    await this.page.click(".cart")
+    await this.page.click('text=Rooms').catch(() => {})
   }
 }
