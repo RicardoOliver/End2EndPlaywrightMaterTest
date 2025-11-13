@@ -14,7 +14,7 @@ export const options = {
   ],
 }
 
-const BASE_URL = __ENV.BASE_URL || 'https://automationintesting.online/#/'
+const BASE_URL = __ENV.BASE_URL || 'https://automationintesting.online/'
 
 export default function () {
   const res = http.get(BASE_URL)

@@ -20,7 +20,7 @@ services:
   k6:
     image: grafana/k6:latest
     environment:
-      - BASE_URL=${BASE_URL:-https://automationintesting.online/#/}
+      - BASE_URL=${BASE_URL:-https://automationintesting.online/}
     volumes:
       - ./performance:/scripts
       - ./reports:/reports

@@ -8,7 +8,7 @@ export class HomePage {
   }
 
   async goTo() {
-    await this.page.goto("/", { waitUntil: "domcontentloaded", timeout: 15000 }).catch(() => {})
+    await this.page.goto("/#/", { waitUntil: "domcontentloaded", timeout: 15000 }).catch(() => {})
   }
 
   async getTitle() {

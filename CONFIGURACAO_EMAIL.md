@@ -177,7 +177,7 @@ Corpo:
 📊 RELATÓRIO DE TESTES PLAYWRIGHT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Site: https://automationteststore.com/
+Site: https://automationintesting.online/
 Data: [timestamp]
 
 📈 MÉTRICAS:

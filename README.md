@@ -1,6 +1,6 @@
 # 🎭 Playwright Testing Framework
 
-Framework completo de testes E2E com Playwright para o site [Automation Test Store](https://automationteststore.com/).
+Framework completo de testes E2E com Playwright para o site [Automation In Testing](https://automationintesting.online/).
 
 ## 📁 Estrutura do Projeto
 
@@ -205,7 +205,7 @@ test('Meu teste', async ({ page }) => {
 
 ## 🌐 Site Testado
 
-**Automation Test Store**: https://automationteststore.com/
+**Automation In Testing**: https://automationintesting.online/
 
 Site de demonstração para prática de automação de testes com:
 - Sistema de login/registro

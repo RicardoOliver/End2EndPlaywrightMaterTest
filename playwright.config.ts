@@ -20,7 +20,7 @@ const useDefaults = {
   screenshot: fastMode ? "off" : "only-on-failure",
   video: fastMode ? "off" : "retain-on-failure",
   trace: fastMode ? "off" : "retain-on-failure",
-  baseURL: process.env.BASE_URL || "https://automationintesting.online/#/",
+  baseURL: process.env.BASE_URL || "https://automationintesting.online/",
 } as const
 
 export default defineConfig({

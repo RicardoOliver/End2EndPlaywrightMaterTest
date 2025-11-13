@@ -15,7 +15,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ### Changed
 - Atualizado package.json com apenas dependências essenciais do Playwright
-- Configurado para Automation Test Store (https://automationteststore.com/)
+- Configurado para Automation In Testing (https://automationintesting.online/)
 - Email de notificação configurado para r.c.d.1985@hotmail.com
 
 ### Added
