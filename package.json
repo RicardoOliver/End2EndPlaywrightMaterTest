@@ -1,7 +1,7 @@
 {
   "name": "playwright-test-framework",
   "version": "1.0.1",
-  "description": "Framework completo de testes E2E com Playwright para Automation Test Store",
+  "description": "Framework completo de testes E2E com Playwright para Automation In Testing",
   "type": "module",
   "scripts": {
     "test": "npx playwright test",
@@ -12,12 +12,10 @@
     "test:chrome": "npx playwright test --project=chromium",
     "test:firefox": "npx playwright test --project=firefox",
     "test:webkit": "npx playwright test --project=webkit",
-    "test:e2e": "npx playwright test tests/e2e",
+    
     "test:smoke": "npx playwright test tests/smoke",
     "test:api": "npx playwright test tests/api",
-    "test:login": "npx playwright test tests/e2e/login.spec.ts",
-    "test:shopping": "npx playwright test tests/e2e/shopping.spec.ts",
-    "test:checkout": "npx playwright test tests/e2e/checkout.spec.ts",
+    
     "test:fast": "set FAST=true&& npx playwright test",
     "test:parallel": "npx playwright test --workers=4",
     "test:serial": "npx playwright test --workers=1",
