@@ -68,15 +68,10 @@ export function contact () {
 }
 
 export function message () {
-  const payload = JSON.stringify({
-    name: 'K6 User',
-    email: 'k6.user@example.com',
-    phone: '1234567890',
-    subject: 'Performance test',
-    description: 'Message created by k6 scenario',
-  })
+  const payload = JSON.parse(open('fixtures/k6-message.json'))
+  const body = JSON.stringify(payload)
   const params = { headers: { 'Content-Type': 'application/json' }, tags: { name: 'message' } }
-  const res = http.post(MESSAGE_URL, payload, params)
+  const res = http.post(MESSAGE_URL, body, params)
   check(res, {
     'message status 2xx/3xx': (r) => r.status >= 200 && r.status < 400,
   })

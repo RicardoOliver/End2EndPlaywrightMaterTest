@@ -1,11 +1,15 @@
 import { test, expect } from "@playwright/test"
+import fs from "fs"
+import path from "path"
 
 test.describe("Contract - /message API", () => {
   const baseURL = "https://automationintesting.online"
 
   test("POST /message with invalid payload returns field errors", async ({ request }) => {
+    const invalidPath = path.resolve("fixtures", "message-invalid.json")
+    const payload = JSON.parse(fs.readFileSync(invalidPath, "utf-8"))
     const response = await request.post(`${baseURL}/message/`, {
-      data: { name: "", email: "invalid", phone: "", subject: "", description: "" },
+      data: payload,
       headers: { "Content-Type": "application/json" },
     })
     const status = response.status()

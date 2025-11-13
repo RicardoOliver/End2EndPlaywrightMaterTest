@@ -24,6 +24,7 @@ services:
     volumes:
       - ./performance:/scripts
       - ./reports:/reports
+      - ./fixtures:/fixtures
     command: ["run", "--summary-export=/reports/k6-summary.json", "/scripts/basic.k6.js"]
 
 volumes:

@@ -1,0 +1,7 @@
+{
+  "name": "K6 User",
+  "email": "k6.user@example.com",
+  "phone": "1234567890",
+  "subject": "Performance test",
+  "description": "Message created by k6 scenario"
+}

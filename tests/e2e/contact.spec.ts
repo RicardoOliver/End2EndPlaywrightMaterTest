@@ -1,5 +1,7 @@
 import { test, expect } from "@playwright/test"
 import { HomePage } from "../../pages/homepage.page"
+import fs from "fs"
+import path from "path"
 
 test.describe("E2E - Contact form submission", () => {
   test("Submit contact form with valid data", async ({ page }) => {
@@ -9,11 +11,13 @@ test.describe("E2E - Contact form submission", () => {
     await page.getByText("Contact").first().click()
     await expect(page).toHaveURL(/.*#\/contact/)
 
-    await page.getByLabel("Name").fill("Test User")
-    await page.getByLabel("Email").fill("test.user@example.com")
-    await page.getByLabel("Phone").fill("1234567890")
-    await page.getByLabel("Subject").fill("Booking enquiry")
-    await page.getByLabel("Message").fill("I would like to know availability.")
+    const dataPath = path.resolve("fixtures", "contact.json")
+    const data = JSON.parse(fs.readFileSync(dataPath, "utf-8"))
+    await page.getByLabel("Name").fill(data.name)
+    await page.getByLabel("Email").fill(data.email)
+    await page.getByLabel("Phone").fill(data.phone)
+    await page.getByLabel("Subject").fill(data.subject)
+    await page.getByLabel("Message").fill(data.message)
 
     await page.getByRole("button", { name: /submit/i }).click()
 
