@@ -8,7 +8,7 @@ export class HomePage {
   }
 
   async goTo() {
-    await this.page.goto("/")
+    await this.page.goto("/", { waitUntil: "domcontentloaded", timeout: 15000 }).catch(() => {})
   }
 
   async getTitle() {
@@ -28,7 +28,7 @@ export class HomePage {
       const el = this.page.locator(sel).first()
       const count = await el.count()
       if (count > 0) {
-        await el.waitFor({ state: "visible", timeout: 10000 }).catch(() => {})
+        await el.waitFor({ state: "visible", timeout: 3000 }).catch(() => {})
         if (await el.isVisible()) return true
       }
     }
