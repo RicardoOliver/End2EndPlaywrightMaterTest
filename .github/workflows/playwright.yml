@@ -68,6 +68,9 @@ jobs:
         if: matrix.os != 'ubuntu-latest'
         run: npx playwright install
 
+      - name: Sanitize shard name
+        run: echo "SHARD_NAME=${{ matrix.shard }}" | sed 's/\//-/g' >> $GITHUB_ENV
+
       - name: Run Playwright tests (full suite, shard ${{ matrix.shard }})
         env:
           EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
@@ -83,7 +86,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: reports-${{ matrix.os }}-node${{ matrix.node }}-shard${{ replace(matrix.shard, '/', '-') }}
+          name: reports-${{ matrix.os }}-node${{ matrix.node }}-shard${{ env.SHARD_NAME }}
           path: reports/html
           if-no-files-found: warn
           retention-days: 30
@@ -93,7 +96,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: report-json-${{ matrix.os }}-node${{ matrix.node }}-shard${{ replace(matrix.shard, '/', '-') }}
+          name: report-json-${{ matrix.os }}-node${{ matrix.node }}-shard${{ env.SHARD_NAME }}
           path: reports/report.json
           if-no-files-found: warn
           retention-days: 30
@@ -103,7 +106,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results-${{ matrix.os }}-node${{ matrix.node }}-shard${{ replace(matrix.shard, '/', '-') }}
+          name: test-results-${{ matrix.os }}-node${{ matrix.node }}-shard${{ env.SHARD_NAME }}
           path: test-results
           if-no-files-found: warn
           retention-days: 30
@@ -159,7 +162,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: allure-${{ matrix.os }}-node${{ matrix.node }}-shard${{ replace(matrix.shard, '/', '-') }}
+          name: allure-${{ matrix.os }}-node${{ matrix.node }}-shard${{ env.SHARD_NAME }}
           path: reports/allure
           if-no-files-found: warn
           retention-days: 30
