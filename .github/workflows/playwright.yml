@@ -50,7 +50,12 @@ jobs:
           restore-keys: ${{ runner.os }}-playwright-
 
       - name: Install dependencies
+        if: ${{ hashFiles('package-lock.json') != '' }}
         run: npm ci
+
+      - name: Install dependencies (fallback)
+        if: ${{ hashFiles('package-lock.json') == '' }}
+        run: npm install --no-fund --no-audit
 
       - name: Install Playwright Browsers (Linux)
         if: matrix.os == 'ubuntu-latest'
@@ -76,6 +81,7 @@ jobs:
         with:
           name: reports-${{ matrix.os }}-node${{ matrix.node }}
           path: reports/html
+          if-no-files-found: warn
           retention-days: 30
 
       - name: Upload JSON report
@@ -84,6 +90,7 @@ jobs:
         with:
           name: report-json-${{ matrix.os }}-node${{ matrix.node }}
           path: reports/report.json
+          if-no-files-found: warn
           retention-days: 30
 
       - name: Setup Java for Allure
@@ -104,6 +111,7 @@ jobs:
         with:
           name: allure-${{ matrix.os }}-node${{ matrix.node }}
           path: reports/allure
+          if-no-files-found: warn
           retention-days: 30
 
   performance:
@@ -111,6 +119,15 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install dependencies
+        run: npm install --no-fund --no-audit
+      - name: Ensure reports directory exists
+        run: mkdir -p reports
       - name: Run k6 performance test
         uses: grafana/k6-action@v0.2.0
         with:
@@ -124,24 +141,15 @@ jobs:
         with:
           name: k6-summary-html
           path: reports/k6-summary.html
+          if-no-files-found: warn
       - name: Upload k6 summary JSON
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: k6-summary-json
           path: reports/k6-summary.json
+          if-no-files-found: warn
 
-      - name: Send notifications
-        if: always()
-        env:
-          EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
-          EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
-          EMAIL_USER: ${{ secrets.EMAIL_USER }}
-          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
-          EMAIL_TO: ${{ secrets.EMAIL_TO }}
-          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
-          TEAMS_WEBHOOK: ${{ secrets.TEAMS_WEBHOOK }}
-          REPORT_JSON_PATH: reports/report.json
-        run: |
-          node --loader ts-node/esm scripts/sendAllNotifications.ts
+      - name: Send notifications (Playwright only)
+        if: false
+        run: echo "Notifications disabled for performance job"
