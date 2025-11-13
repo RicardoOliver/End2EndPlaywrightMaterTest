@@ -74,8 +74,8 @@ jobs:
           EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
           SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
           TEAMS_WEBHOOK: ${{ secrets.TEAMS_WEBHOOK }}
-        run: npx playwright test --max-failures=1
-          --shard=${{ matrix.shard }}
+          PW_FAST: true
+        run: npx playwright test --max-failures=1 --shard=${{ matrix.shard }}
 
       - name: Upload HTML report
         if: always()
