@@ -49,7 +49,7 @@ export class HomePage {
     const search = this.page.locator("#filter_keyword").first()
     const mainText = this.page.locator(".maintext").first()
     const logo = this.page.locator(".logo, .logo img, #logo").first()
-    await Promise.any([
+    await Promise.race([
       search.waitFor({ state: "visible", timeout: 10000 }),
       mainText.waitFor({ state: "visible", timeout: 10000 }),
       logo.waitFor({ state: "visible", timeout: 10000 }),
