@@ -25,8 +25,9 @@ const useDefaults = {
 
 export default defineConfig({
   testDir: "./tests",
-  timeout: 60 * 1000,
-  retries: process.env.CI ? 2 : 0,
+  timeout: 45 * 1000,
+  retries: process.env.CI ? 1 : 0,
+  fullyParallel: true,
   reporter: [
     ["html", { outputFolder: "reports/html", open: "never" }],
     ["json", { outputFile: "reports/report.json" }],
