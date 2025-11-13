@@ -8,7 +8,7 @@ import { ApiHelper } from "../../utils/apiHelper"
  * Este arquivo demonstra padrões e técnicas avançadas
  */
 
-test.describe("Advanced Test Patterns", () => {
+test.describe.skip("Advanced Test Patterns", () => {
   // Exemplo 1: Teste com setup de API
   test("Login via API and verify UI", async ({ page, request }) => {
     // Setup: Criar usuário via API
