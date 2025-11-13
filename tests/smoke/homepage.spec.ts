@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test"
 import { HomePage } from "../../pages/homepage.page"
+import fs from "fs"
 import { BookingPage } from "../../pages/booking.page"
 
 test.describe("Homepage Tests - Automation In Testing", () => {
@@ -8,6 +9,12 @@ test.describe("Homepage Tests - Automation In Testing", () => {
   test.beforeEach(async ({ page }) => {
     homePage = new HomePage(page)
     await homePage.goTo()
+    if (process.env.USE_HAR === "true") {
+      const harPath = "har/smoke.har"
+      if (fs.existsSync(harPath)) {
+        await page.context().routeFromHAR(harPath, { update: false, notFound: "fallback" })
+      }
+    }
   })
 
   test("Homepage loads successfully", async () => {

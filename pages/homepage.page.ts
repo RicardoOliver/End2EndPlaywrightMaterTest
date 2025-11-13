@@ -1,4 +1,5 @@
 import { type Page, expect } from "@playwright/test"
+import { stabilize, visibleOrFalse } from "../utils/guardians"
 
 export class HomePage {
   readonly page: Page
@@ -9,6 +10,7 @@ export class HomePage {
 
   async goTo() {
     await this.page.goto("/#/", { waitUntil: "domcontentloaded", timeout: 15000 }).catch(() => {})
+    await stabilize(this.page)
   }
 
   async getTitle() {
@@ -24,7 +26,7 @@ export class HomePage {
     ]
     for (const t of texts) {
       const el = this.page.locator(`text=${t}`).first()
-      if (await el.isVisible().catch(() => false)) return true
+      if (await visibleOrFalse(el)) return true
     }
     return false
   }
@@ -39,8 +41,7 @@ export class HomePage {
   }
 
   async expectPageLoaded() {
-    await this.page.waitForLoadState("domcontentloaded")
-    await this.page.waitForLoadState("networkidle").catch(() => {})
+    await stabilize(this.page)
     const brand = this.page.locator("text=Shady Meadows B&B").first()
     const rooms = this.page.locator("text=Rooms").first()
     await Promise.race([

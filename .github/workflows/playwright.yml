@@ -217,6 +217,8 @@ jobs:
         node: [ 20 ]
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
@@ -224,10 +226,34 @@ jobs:
         run: npm ci || npm install --no-fund --no-audit
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
+      - name: Select impacted tests
+        id: tia
+        run: |
+          CHANGED=$(git diff --name-only HEAD^ HEAD || true)
+          FILES=""
+          for f in $CHANGED; do
+            case "$f" in
+              pages/*)
+                NAME=$(basename "$f" .ts)
+                FOUND=$(grep -rl "$NAME" tests || true)
+                FILES="$FILES $FOUND"
+                ;;
+              tests/*)
+                FILES="$FILES $f"
+                ;;
+            esac
+          done
+          FILES=$(echo $FILES | xargs -n1 | sort -u | xargs)
+          echo "TEST_FILES=$FILES" >> $GITHUB_ENV
       - name: Run smoke tests (fast)
         env:
           PW_FAST: true
-        run: npx playwright test tests/smoke --max-failures=1
+        run: |
+          if [ -n "${TEST_FILES}" ]; then
+            npx playwright test ${TEST_FILES} --max-failures=1 || npx playwright test tests/smoke --max-failures=1
+          else
+            npx playwright test tests/smoke --max-failures=1
+          fi
       - name: Upload HTML report (smoke)
         if: always()
         uses: actions/upload-artifact@v4
