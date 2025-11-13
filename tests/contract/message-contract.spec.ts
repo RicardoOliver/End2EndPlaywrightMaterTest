@@ -2,6 +2,8 @@ import { test, expect } from "@playwright/test"
 import fs from "fs"
 import path from "path"
 
+test.describe.configure({ retries: process.env.CI ? 1 : 0 })
+
 test.describe("Contract - /message API", () => {
   const baseURL = "https://automationintesting.online"
 
