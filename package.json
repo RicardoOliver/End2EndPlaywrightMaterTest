@@ -22,8 +22,8 @@
     "codegen": "npx playwright codegen https://automationintesting.online/#/",
     "install:browsers": "npx playwright install",
     "notify": "node --loader ts-node/esm scripts/sendAllNotifications.ts",
-    "report:allure": "npx -y allure-commandline@2.18.0 generate allure-results -o reports/allure --clean",
-    "report:allure:open": "npx -y allure-commandline@2.18.0 open reports/allure",
+    "report:allure": "npx -y allure-commandline@2.13.9 generate allure-results -o reports/allure --clean",
+    "report:allure:open": "npx -y allure-commandline@2.13.9 open reports/allure",
     "perf:k6": "docker compose run --rm k6"
   },
   "dependencies": {
