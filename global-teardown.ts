@@ -44,7 +44,12 @@ async function globalTeardown() {
   console.log("")
 
   try {
-    await sendAllNotifications("reports/report.json")
+    const reportPath = path.resolve("reports", "report.json")
+    if (!fs.existsSync(reportPath)) {
+      console.warn(`⚠️  Report JSON not found at ${reportPath} — skipping notifications.`)
+      return
+    }
+    await sendAllNotifications(reportPath)
   } catch (error) {
     console.error("❌ Error sending notifications:", error)
   }
