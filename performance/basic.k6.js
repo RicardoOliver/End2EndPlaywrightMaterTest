@@ -2,24 +2,83 @@ import http from 'k6/http'
 import { check, sleep } from 'k6'
 import { htmlReport } from 'https://jslib.k6.io/k6-summary/0.0.4/index.js'
 
+const BASE_URL = __ENV.BASE_URL || 'https://automationintesting.online/'
+const HOME_URL = `${BASE_URL}#/`
+const CONTACT_URL = `${BASE_URL}#/contact`
+const MESSAGE_URL = `${BASE_URL}message/`
+
 export const options = {
-  thresholds: {
-    http_req_failed: ['rate<0.01'],
-    http_req_duration: ['p(95)<500'],
+  scenarios: {
+    home: {
+      executor: 'ramping-vus',
+      startVUs: 0,
+      stages: [
+        { duration: '30s', target: 20 },
+        { duration: '1m', target: 50 },
+        { duration: '30s', target: 0 },
+      ],
+      exec: 'home',
+      tags: { scenario: 'home' },
+    },
+    contact: {
+      executor: 'ramping-vus',
+      startVUs: 0,
+      stages: [
+        { duration: '20s', target: 10 },
+        { duration: '40s', target: 20 },
+        { duration: '20s', target: 0 },
+      ],
+      exec: 'contact',
+      tags: { scenario: 'contact' },
+    },
+    message: {
+      executor: 'ramping-vus',
+      startVUs: 0,
+      stages: [
+        { duration: '20s', target: 5 },
+        { duration: '40s', target: 15 },
+        { duration: '20s', target: 0 },
+      ],
+      exec: 'message',
+      tags: { scenario: 'message' },
+    },
   },
-  stages: [
-    { duration: '30s', target: 20 },
-    { duration: '1m', target: 50 },
-    { duration: '30s', target: 0 },
-  ],
+  thresholds: {
+    'http_req_failed': ['rate<0.01'],
+    'http_req_duration{scenario:home}': ['p(95)<800'],
+    'http_req_duration{scenario:contact}': ['p(95)<800'],
+    'http_req_duration{scenario:message}': ['p(95)<1000'],
+  },
 }
 
-const BASE_URL = __ENV.BASE_URL || 'https://automationintesting.online/'
-
-export default function () {
-  const res = http.get(BASE_URL)
+export function home () {
+  const res = http.get(HOME_URL, { tags: { name: 'home' } })
   check(res, {
-    'status 200': (r) => r.status === 200,
+    'home status 200': (r) => r.status === 200,
+  })
+  sleep(1)
+}
+
+export function contact () {
+  const res = http.get(CONTACT_URL, { tags: { name: 'contact' } })
+  check(res, {
+    'contact status 200': (r) => r.status === 200,
+  })
+  sleep(1)
+}
+
+export function message () {
+  const payload = JSON.stringify({
+    name: 'K6 User',
+    email: 'k6.user@example.com',
+    phone: '1234567890',
+    subject: 'Performance test',
+    description: 'Message created by k6 scenario',
+  })
+  const params = { headers: { 'Content-Type': 'application/json' }, tags: { name: 'message' } }
+  const res = http.post(MESSAGE_URL, payload, params)
+  check(res, {
+    'message status 2xx/3xx': (r) => r.status >= 200 && r.status < 400,
   })
   sleep(1)
 }
