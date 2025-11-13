@@ -4,7 +4,7 @@ Framework completo de testes E2E com Playwright para o site [Automation Test Sto
 
 ## 📁 Estrutura do Projeto
 
-\`\`\`
+```bash
 playwright-framework/
 ├─ tests/
 │  ├─ e2e/              # Testes End-to-End
@@ -37,21 +37,21 @@ playwright-framework/
 │  ├─ metrics.ts
 │  └─ notifyResults.ts
 └─ reports/             # Relatórios HTML e JSON
-\`\`\`
+```
 
 ## 🚀 Instalação
 
-\`\`\`bash
+```bash
 npm install
 npx playwright install
-\`\`\`
+```
 
 ## ⚙️ Configuração
 
 1. Copie `.env.example` para `.env`
 2. Configure suas credenciais:
 
-\`\`\`env
+```env
 # Email (SMTP) - OBRIGATÓRIO
 EMAIL_HOST=smtp.seuprovedor.com
 EMAIL_PORT=587
@@ -64,11 +64,11 @@ SLACK_TOKEN=<SLACK_BOT_TOKEN>
 
 # Teams Webhook URL - OPCIONAL
 TEAMS_WEBHOOK=https://outlook.office.com/webhook/...
-\`\`\`
+```
 
 ## 🧪 Executar Testes
 
-\`\`\`bash
+```bash
 # Todos os testes
 npm run test
 
@@ -91,7 +91,7 @@ npx playwright test --project=firefox
 
 # Modo debug
 npx playwright test --debug
-\`\`\`
+```
 
 ## 🎯 Testes Disponíveis
 
@@ -153,7 +153,7 @@ Pipeline GitHub Actions configurado em `.github/workflows/playwright.yml`
 ## 📝 Adicionar Novos Testes
 
 1. **Criar Page Object** em `pages/`:
-\`\`\`typescript
+```typescript
 export class MinhaPage {
   constructor(readonly page: Page) {}
   
@@ -161,10 +161,10 @@ export class MinhaPage {
     await this.page.click('.seletor')
   }
 }
-\`\`\`
+```
 
 2. **Adicionar teste** em `tests/e2e/`:
-\`\`\`typescript
+```typescript
 import { test } from '@playwright/test'
 import { MinhaPage } from '../../pages/minha.page'
 
@@ -172,7 +172,7 @@ test('Meu teste', async ({ page }) => {
   const minhaPage = new MinhaPage(page)
   await minhaPage.minhaAcao()
 })
-\`\`\`
+```
 
 3. **Usar fixtures** de `fixtures/` para dados de teste
 
