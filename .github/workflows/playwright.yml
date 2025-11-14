@@ -165,7 +165,7 @@ jobs:
           overwrite: true
 
       - name: Upload Allure report to Pages artifact
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.node == 20 && matrix.shard == '1/2' }}
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.node == 20 && matrix.shard == '1/2' && vars.PAGES_ENABLED == 'true' }}
         uses: actions/upload-pages-artifact@v3
         with:
           path: reports/allure
@@ -524,7 +524,7 @@ jobs:
           retention-days: 30
   deploy_pages:
     needs: [test]
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.PAGES_ENABLED == 'true' }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
