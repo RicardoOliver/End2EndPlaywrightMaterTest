@@ -180,7 +180,7 @@ jobs:
           overwrite: true
 
       - name: Upload Allure report to Pages artifact
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.node == 20 && matrix.shard == '1/2' }}
         uses: actions/upload-pages-artifact@v3
         with:
           path: reports/allure
