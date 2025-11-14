@@ -21,10 +21,9 @@
     "install:browsers": "npx playwright install",
     "notify": "node --loader ts-node/esm scripts/sendAllNotifications.ts",
     "report:allure": "npx -y allure-commandline@2.34.1 generate allure-results -o reports/allure --clean",
-    "report:allure:open": "node -e \"const {exec}=require('child_process'); const cmd=process.platform==='win32' ? 'start \\\\\"reports/allure/index.html\\\\\"' : 'xdg-open reports/allure/index.html'; exec(cmd)\"",
-    "perf:k6": "docker compose run --rm k6",
-    "report:allure:open:win": "powershell -NoProfile -Command Start-Process -FilePath 'reports/allure/index.html'",
-    "report:allure:open:cross": "node scripts/openAllureReport.mjs"
+    "report:allure:serve": "npx -y allure-commandline@2.34.1 open reports/allure",
+    "perf:k6": "docker compose run --rm k6"
+    
   },
   "dependencies": {
     "@slack/web-api": "latest",
@@ -45,3 +44,7 @@
     "node": ">=18.0.0"
   }
 }
+
+
+
+
