@@ -12,34 +12,34 @@
     "test:chrome": "npx playwright test --project=chromium",
     "test:firefox": "npx playwright test --project=firefox",
     "test:webkit": "npx playwright test --project=webkit",
-    
     "test:smoke": "npx playwright test tests/smoke",
     "test:api": "npx playwright test tests/api",
-    
     "test:fast": "set FAST=true&& npx playwright test",
     "test:parallel": "npx playwright test --workers=4",
     "test:serial": "npx playwright test --workers=1",
     "codegen": "npx playwright codegen https://automationintesting.online/#/",
     "install:browsers": "npx playwright install",
     "notify": "node --loader ts-node/esm scripts/sendAllNotifications.ts",
-    "report:allure": "npx -y allure-commandline@2.13.9 generate allure-results -o reports/allure --clean",
+    "report:allure": "npx -y allure-commandline@2.34.1 generate allure-results -o reports/allure --clean",
     "report:allure:open": "node -e \"const {exec}=require('child_process'); const cmd=process.platform==='win32' ? 'start \\\\\"reports/allure/index.html\\\\\"' : 'xdg-open reports/allure/index.html'; exec(cmd)\"",
-    "perf:k6": "docker compose run --rm k6"
+    "perf:k6": "docker compose run --rm k6",
+    "report:allure:open:win": "powershell -NoProfile -Command Start-Process -FilePath 'reports/allure/index.html'",
+    "report:allure:open:cross": "node scripts/openAllureReport.mjs"
   },
   "dependencies": {
     "@slack/web-api": "latest",
+    "archiver": "^6.0.1",
     "dotenv": "^16.4.5",
-    "nodemailer": "^6.9.15",
-    "archiver": "^6.0.1"
+    "nodemailer": "^6.9.15"
   },
   "devDependencies": {
     "@playwright/test": "^1.41.0",
     "@types/node": "^22",
     "@types/nodemailer": "^6.4.16",
-    "typescript": "^5",
+    "allure-commandline": "^2.34.1",
     "allure-playwright": "^2.0.0",
-    "allure-commandline": "^2.18.0",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^5"
   },
   "engines": {
     "node": ">=18.0.0"
