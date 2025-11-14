@@ -6,6 +6,7 @@
   "scripts": {
     "test": "npx playwright test",
     "test:booking": "npx playwright test tests/e2e/booking.full.spec.ts --project=chromium --workers=1",
+    "test:booking:headed": "npx playwright test tests/e2e/booking.full.spec.ts --project=chromium --headed --workers=1",
     "test:headed": "npx playwright test --headed",
     "test:ui": "npx playwright test --ui",
     "test:debug": "npx playwright test --debug",

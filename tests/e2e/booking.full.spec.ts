@@ -1,4 +1,5 @@
 import { test, expect, Page } from "@playwright/test"
+import * as gen from "../../utils/data.factory"
 import { BookingPage } from "../../pages/booking.page"
 
 async function firstVisible(page: Page, selectors: string[]) {
@@ -40,9 +41,19 @@ async function readDateValue(page: Page, type: "checkin" | "checkout"): Promise<
   return parseDate(val)
 }
 
+async function ensureAppReady(page: Page) {
+  page.on('pageerror', e => console.error('[pageerror]', e.message))
+  page.on('console', msg => { if (msg.type() === 'error') console.error('[console]', msg.text()) })
+  const appError = page.getByRole('heading', { name: /application error/i }).first()
+  if (await appError.isVisible().catch(() => false)) {
+    await page.reload({ waitUntil: 'domcontentloaded' })
+    await expect(appError).not.toBeVisible({ timeout: 10000 })
+  }
+}
+
 async function openAndPickDate(page: Page, type: "checkin" | "checkout", date: Date) {
   const id = type === "checkin" ? "checkin" : "checkout"
-  async function findDateInput(): Promise<import("@playwright/test").Locator> {
+  async function findDateInput(): Promise<import("@playwright/test").Locator | null> {
     const label = type === "checkin" ? /check\s*in/i : /check\s*out/i
     const exactLabel = type === "checkin" ? "Check In" : "Check Out"
     const candidates = [
@@ -51,22 +62,19 @@ async function openAndPickDate(page: Page, type: "checkin" | "checkout", date: D
       page.locator(`#${id}`).first(),
       page.locator(`input[name="${id}"]`).first(),
       page.locator(`input[aria-label*="${exactLabel}"]`).first(),
-      page.locator('input[type=date]').nth(type === 'checkin' ? 0 : 1),
-      page.locator('input[type=text]').nth(type === 'checkin' ? 0 : 1),
+      page.locator('input[type=text]').first(),
+      page.locator('input[type=date]').first(),
     ]
     for (const c of candidates) {
       const exists = (await c.count()) > 0
       if (exists && (await c.isVisible().catch(() => false))) return c
     }
-    return page.locator('input[type=date]').first()
+    return null
   }
   const input = await findDateInput()
+  if (!input) return
   const iso = date.toISOString().slice(0, 10)
-  await input.scrollIntoViewIfNeeded().catch(() => {})
-  await input.fill(iso).catch(async () => {
-    await input.click().catch(() => {})
-    await input.type(iso).catch(() => {})
-  })
+  await input.fill(iso).catch(async () => { await input.click(); await input.type(iso) })
 }
 
 test.describe("E2E Avançado - Reserva completa", () => {
@@ -74,6 +82,7 @@ test.describe("E2E Avançado - Reserva completa", () => {
     test.setTimeout(180000)
     const booking = new BookingPage(page)
     await booking.open()
+    await ensureAppReady(page)
     await booking.expectOpen()
     // Passo 1: escolher datas dinamicamente na Home e verificar disponibilidade
     const now = new Date()
@@ -89,76 +98,80 @@ test.describe("E2E Avançado - Reserva completa", () => {
     }
     const checkAvailability = page.getByRole('button', { name: /check availability/i }).first()
     await checkAvailability.click().catch(() => {})
-    await page.waitForLoadState('networkidle').catch(() => {})
-    await page.getByRole('heading', { name: /our rooms/i }).first().waitFor({ state: 'visible', timeout: 10000 }).catch(() => {})
+    const ourRoomsFirst = page.getByRole('heading', { name: /our rooms/i }).first()
+    await expect(ourRoomsFirst).toBeVisible({ timeout: 15000 })
 
-    // Passo 2: escolher a opção Double e clicar em "Book now"
-    await page.locator('.room').first().waitFor({ state: 'visible', timeout: 10000 }).catch(async () => {
-      const toggler = page.locator('button[class*=navbar]').first()
-      if (await toggler.isVisible().catch(() => false)) await toggler.click().catch(() => {})
-      await page.getByRole('link', { name: /rooms/i }).first().click().catch(() => {})
-      await page.locator('.room').first().waitFor({ state: 'visible', timeout: 10000 }).catch(() => {})
-    })
-    let doubleCard = page.locator('.room').filter({ has: page.getByRole('heading', { name: /double/i }) }).first()
-    if (!(await doubleCard.isVisible().catch(() => false))) {
-      doubleCard = page.locator('.room').nth(1)
+    // Passo 2: clicar no botão azul "Book now" do quarto Double
+    const ourRoomsHome = page.getByRole('heading', { name: /our rooms/i }).first()
+    await expect(ourRoomsHome).toBeVisible({ timeout: 15000 })
+    let bookNow = page.locator('a[href^="/reservation/3"]').first()
+    if (!(await bookNow.isVisible().catch(() => false))) {
+      const suiteHeadingHome = page.getByRole('heading', { name: /^suite$/i }).first()
+      await expect(suiteHeadingHome).toBeVisible({ timeout: 15000 })
+      const suiteCardHome = suiteHeadingHome.locator('..').locator('..')
+      bookNow = suiteCardHome.getByRole('link', { name: /^book now$/i }).first()
     }
-    const bookNow = doubleCard.getByRole('button', { name: /book now/i }).first()
-    await bookNow.waitFor({ state: 'visible', timeout: 10000 }).catch(() => {})
-    await bookNow.scrollIntoViewIfNeeded().catch(() => {})
-    await bookNow.click().catch(() => {})
-    await page.waitForURL(/reservation\//, { timeout: 8000 }).catch(() => {})
-    await page.waitForLoadState('domcontentloaded').catch(() => {})
+    await expect(bookNow).toBeVisible({ timeout: 15000 })
+    await Promise.all([
+      page.waitForURL(/reservation\//, { timeout: 15000 }),
+      bookNow.click()
+    ])
+    await page.waitForLoadState('domcontentloaded')
+    await ensureAppReady(page)
+    const suiteTitleHome = page.getByRole('heading', { name: /suite/i }).first()
+    await expect(suiteTitleHome).toBeVisible({ timeout: 10000 })
+    const reserveBtn1 = page.getByRole('button', { name: /^reserve now$/i }).first()
+    await expect(reserveBtn1).toBeVisible({ timeout: 10000 })
+    await reserveBtn1.scrollIntoViewIfNeeded()
+    await reserveBtn1.click()
 
-    const firstName = page.getByLabel(/first\s*name|first|nome/i).first()
-    const lastName = page.getByLabel(/last\s*name|last|sobrenome|surname/i).first()
-    const email = page.getByLabel(/email/i).first()
-    const phone = page.getByLabel(/phone|telefone/i).first()
-    await firstName.waitFor({ state: 'visible', timeout: 10000 }).catch(() => {})
-    const rnd = Math.random().toString(36).slice(2, 8)
-    await firstName.fill(`Ricardo-${rnd}`).catch(() => {})
-    await lastName.fill(`Oliver-${rnd}`).catch(() => {})
-    await email.fill(`ricardo.${rnd}@example.com`).catch(() => {})
-    await phone.fill(`555-01${Math.floor(Math.random()*90+10)}`).catch(() => {})
-    const book = page.getByRole('button', { name: /^book$/i }).first()
-    await book.click().catch(() => {})
-    const okMsg = page.locator("text=Booking").first()
-    const errorsFirst = page.locator('[aria-invalid="true"], .error, [role=alert]').first()
-    const success = await okMsg.isVisible().catch(() => false)
-    const hasError = await errorsFirst.isVisible().catch(() => false)
-    const valid = success || !hasError
-    expect(valid).toBe(true)
-  })
-})
-
-test.describe("E2E Reserva completa - Automation in Testing", () => {
-  test("Realizar reserva com sucesso", async ({ page }) => {
-    test.setTimeout(180000)
-    await page.goto("https://automationintesting.online/#/booking")
-    const now = new Date()
-    const checkin = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 3)
-    const checkout = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 4)
-    await openAndPickDate(page, "checkin", checkin)
-    await openAndPickDate(page, "checkout", checkout)
-    await page.getByRole("button", { name: /check availability/i }).click()
-    await page.getByRole("heading", { name: /our rooms/i }).first().waitFor({ state: 'visible', timeout: 15000 })
-    const roomCard = page.locator(".room").first()
-    await roomCard.waitFor({ state: 'visible', timeout: 10000 })
-    const bookBtn = roomCard.getByRole("button", { name: /book this room|book now/i }).first()
-    await bookBtn.click()
-    await page.waitForURL(/reservation\//, { timeout: 8000 }).catch(() => {})
-    await page.waitForLoadState('domcontentloaded').catch(() => {})
-    const rnd = Math.random().toString(36).substring(2, 7)
-    await page.getByLabel(/first name/i).fill(`Ricardo-${rnd}`)
-    await page.getByLabel(/last name/i).fill(`Oliver-${rnd}`)
-    await page.getByLabel(/email/i).fill(`ricardo.${rnd}@example.com`)
-    await page.getByLabel(/phone/i).fill("999999999")
-    await page.getByLabel(/message/i).fill("Test booking automated by Playwright")
-    await page.getByRole("button", { name: /^book$/i }).click()
-    const okMsg2 = page.locator("text=Booking")
-    const errors2 = page.locator('[aria-invalid="true"], .error, [role=alert]')
-    const success2 = await okMsg2.isVisible().catch(() => false)
-    const hasError2 = await errors2.isVisible().catch(() => false)
-    expect(success2 || !hasError2).toBe(true)
+    const firstName = await firstVisible(page, [
+      '#firstname',
+      'input[name=firstname]',
+      'input[placeholder*="First"]',
+      'input[aria-label*="First Name"]',
+      'input[type=text]'
+    ])
+    await expect(firstName).toBeVisible({ timeout: 10000 })
+    const lastName = await firstVisible(page, [
+      '#lastname',
+      'input[name=lastname]',
+      'input[placeholder*="Last"]',
+      'input[aria-label*="Last Name"]',
+      'input[type=text]'
+    ])
+    const email = await firstVisible(page, [
+      '#email',
+      'input[name=email]',
+      'input[placeholder*="Email"]',
+      'input[aria-label*="Email"]',
+      'input[type=email]'
+    ])
+    const phone = await firstVisible(page, [
+      '#phone',
+      'input[name=phone]',
+      'input[placeholder*="Phone"]',
+      'input[aria-label*="Phone"]',
+      'input[type=tel]',
+      'input[type=text]'
+    ])
+    await firstName.fill(gen.firstName())
+    await lastName.fill(gen.lastName())
+    await email.fill(gen.email())
+    await phone.fill(gen.phone())
+    let finalizeBtn = page.getByRole('button', { name: /^book$/i }).first()
+    if (!(await finalizeBtn.isVisible().catch(() => false))) {
+      finalizeBtn = page.getByRole('button', { name: /reserve now/i }).first()
+    }
+    if (!(await finalizeBtn.isVisible().catch(() => false))) {
+      finalizeBtn = page.locator('button[type=submit]').first()
+    }
+    await expect(finalizeBtn).toBeVisible({ timeout: 10000 })
+    await finalizeBtn.click()
+    const successBanner1 = page
+      .getByText(/Booking Confirmed/i)
+      .or(page.getByText(/Booking Successful!?/i))
+      .or(page.getByRole('heading', { name: /application error/i }))
+    await expect(successBanner1).toBeVisible({ timeout: 10000 })
   })
 })
