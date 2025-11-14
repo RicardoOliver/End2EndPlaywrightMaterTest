@@ -11,6 +11,10 @@ export class HomePage {
   async goTo() {
     await this.page.goto("/#/", { waitUntil: "domcontentloaded", timeout: 15000 }).catch(() => {})
     await stabilize(this.page)
+    const toggler = this.page.locator('button[class*=navbar]').first()
+    if (await visibleOrFalse(toggler, 1000)) {
+      await toggler.click().catch(() => {})
+    }
   }
 
   async getTitle() {
@@ -43,7 +47,7 @@ export class HomePage {
   async expectPageLoaded() {
     await stabilize(this.page)
     const brand = this.page.locator("text=Shady Meadows B&B").first()
-    const rooms = this.page.locator("text=Rooms").first()
+    const rooms = this.page.getByRole("link", { name: /rooms/i }).first()
     await Promise.race([
       brand.waitFor({ state: "visible", timeout: 10000 }),
       rooms.waitFor({ state: "visible", timeout: 10000 }),
@@ -55,10 +59,14 @@ export class HomePage {
   }
 
   async clickLoginLink() {
-    await this.page.click('text=Make a booking').catch(() => {})
+    const toggler = this.page.locator('button[class*=navbar]').first()
+    if (await visibleOrFalse(toggler, 1000)) await toggler.click().catch(() => {})
+    await this.page.getByRole('link', { name: /make a booking/i }).first().click().catch(() => {})
   }
 
   async clickCartIcon() {
-    await this.page.click('text=Rooms').catch(() => {})
+    const toggler = this.page.locator('button[class*=navbar]').first()
+    if (await visibleOrFalse(toggler, 1000)) await toggler.click().catch(() => {})
+    await this.page.getByRole('link', { name: /rooms/i }).first().click().catch(() => {})
   }
 }

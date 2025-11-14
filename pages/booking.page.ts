@@ -10,8 +10,12 @@ export class BookingPage {
   async open() {
     await this.page.goto("/#/", { waitUntil: "domcontentloaded", timeout: 15000 }).catch(() => {})
     await this.page.waitForLoadState("networkidle").catch(() => {})
-    const makeBooking = this.page.getByText("Make a booking", { exact: false }).first()
-    const roomsLink = this.page.getByText("Rooms", { exact: false }).first()
+    const toggler = this.page.locator('button[class*=navbar]').first()
+    if (await toggler.isVisible().catch(() => false)) {
+      await toggler.click().catch(() => {})
+    }
+    const makeBooking = this.page.getByRole('link', { name: /make a booking/i }).first()
+    const roomsLink = this.page.getByRole('link', { name: /rooms/i }).first()
     await makeBooking.waitFor({ state: "visible", timeout: 10000 }).catch(() => {})
     if (await makeBooking.isVisible().catch(() => false)) {
       await makeBooking.click()
@@ -25,8 +29,8 @@ export class BookingPage {
 
   async expectOpen() {
     const bookButton = this.page.getByRole("button", { name: /book/i }).first()
-    const makeBooking = this.page.getByText("Make a booking", { exact: false }).first()
-    const roomsHeading = this.page.locator("text=Rooms").first()
+    const makeBooking = this.page.getByRole('link', { name: /make a booking/i }).first()
+    const roomsHeading = this.page.getByRole('link', { name: /rooms/i }).first()
     await Promise.race([
       bookButton.waitFor({ state: "visible", timeout: 10000 }),
       makeBooking.waitFor({ state: "visible", timeout: 10000 }),
