@@ -190,12 +190,16 @@ test('Meu teste', async ({ page }) => {
 - Cenários: `home`, `contact`, `roomsSection`, `message`
 - Saídas: `reports/k6-summary.json`, `reports/k6-summary.html` e métricas em InfluxDB (opcional)
 - CI: job `performance` publica artefatos em Actions
+ - Visualização no Grafana:
+   ![Grafana Dashboard](docs/media/grafana-dashboard.png)
 
 ## 📈 Allure
 
 - Gerar: `npm run report:allure`
 - Abrir: `npm run report:allure:open`
 - Requer Java instalado no ambiente
+
+![Allure Report](docs/media/allure-report.png)
 
 ## 🎬 Mídias (Vídeos e Imagens)
 
