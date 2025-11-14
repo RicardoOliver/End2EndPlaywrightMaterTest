@@ -46,13 +46,6 @@ jobs:
           key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
           restore-keys: ${{ runner.os }}-playwright-
 
-      - name: Cache Playwright browsers (Windows)
-        if: matrix.os == 'windows-latest'
-        uses: actions/cache@v4
-        with:
-          path: C:\Users\runneradmin\AppData\Local\ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
-          restore-keys: ${{ runner.os }}-playwright-
 
       - name: Install dependencies
         if: ${{ hashFiles('package-lock.json') != '' }}
@@ -66,21 +59,13 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: npx playwright install --with-deps
 
-      - name: Install Playwright Browsers
-        if: matrix.os != 'ubuntu-latest'
-        run: npx playwright install
+      # Non-ubuntu browsers install step removed (matrix uses only ubuntu)
 
       - name: Sanitize shard name
         run: echo "SHARD_NAME=${{ matrix.shard }}" | sed 's/\//-/g' >> $GITHUB_ENV
 
       - name: Run Playwright tests (full suite, shard ${{ matrix.shard }})
         env:
-          EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
-          EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
-          EMAIL_USER: ${{ secrets.EMAIL_USER }}
-          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
-          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-          TEAMS_WEBHOOK: ${{ secrets.TEAMS_WEBHOOK }}
           PW_FAST: true
         run: npx playwright test --max-failures=1 --shard=${{ matrix.shard }}
 
@@ -205,6 +190,10 @@ jobs:
           flags: --summary-export=reports/k6-summary.json
         env:
           BASE_URL: ${{ vars.BASE_URL || secrets.BASE_URL || 'https://automationintesting.online/' }}
+      - name: Generate k6 summary HTML
+        run: |
+          npm install --no-fund --no-audit k6-reporter@2.6.0 || true
+          node -e "const fs=require('fs'); const report=require('k6-reporter'); const input='reports/k6-summary.json'; if(fs.existsSync(input)){ const html=report.fromJson(input); fs.writeFileSync('reports/k6-summary.html', html); console.log('k6 summary HTML generated'); } else { console.log('k6 summary JSON not found'); }"
       - name: Upload k6 summary HTML
         if: always()
         uses: actions/upload-artifact@v4
@@ -363,9 +352,7 @@ jobs:
           git commit -m "docs(media): update demo.mp4 from recorded demo test" || true
           git push || true
 
-      - name: Send notifications (Playwright only)
-        if: false
-        run: echo "Notifications disabled for performance job"
+      # Notifications step removed (was disabled)
 
   test_smoke_pr:
     if: ${{ github.event_name == 'pull_request' }}
