@@ -165,7 +165,7 @@ jobs:
       - name: Generate Allure report
         if: always()
         run: |
-          npx allure-commandline generate allure-results -o reports/allure --clean
+          npx -y allure-commandline@2.34.1 generate allure-results -o reports/allure --clean
 
       - name: Upload Allure HTML report
         if: always()
@@ -502,7 +502,7 @@ jobs:
       - name: Generate Allure report
         if: always()
         run: |
-          npx allure-commandline generate allure-results -o reports/allure --clean
+          npx -y allure-commandline@2.34.1 generate allure-results -o reports/allure --clean
       - name: Upload HTML report
         if: always()
         uses: actions/upload-artifact@v4
