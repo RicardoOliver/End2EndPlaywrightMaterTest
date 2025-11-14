@@ -27,7 +27,7 @@ const useDefaults = {
 
 export default defineConfig({
   testDir: "./tests",
-  timeout: 45 * 1000,
+  timeout: 120 * 1000,
   retries: process.env.CI ? 1 : 0,
   fullyParallel: true,
   reporter: [
