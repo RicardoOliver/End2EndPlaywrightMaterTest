@@ -22,6 +22,7 @@ const useDefaults = {
   trace: fastMode ? "off" : "retain-on-failure",
   baseURL: process.env.BASE_URL || "https://automationintesting.online/",
   outputDir: "test-results",
+  viewport: null,
 } as const
 
 export default defineConfig({
@@ -37,11 +38,37 @@ export default defineConfig({
   ],
   use: useDefaults,
   projects: fastMode
-    ? [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }]
+    ? [
+        {
+          name: "chromium",
+          use: {
+            viewport: null,
+            launchOptions: { args: ["--start-maximized"] },
+          },
+        },
+      ]
     : [
-        { name: "chromium", use: { ...devices["Desktop Chrome"] } },
-        { name: "firefox", use: { ...devices["Desktop Firefox"] } },
-        { name: "webkit", use: { ...devices["Desktop Safari"] } },
+        {
+          name: "chromium",
+          use: {
+            viewport: null,
+            launchOptions: { args: ["--start-maximized"] },
+          },
+        },
+        {
+          name: "firefox",
+          use: {
+            ...devices["Desktop Firefox"],
+            viewport: { width: 1920, height: 1080 },
+          },
+        },
+        {
+          name: "webkit",
+          use: {
+            ...devices["Desktop Safari"],
+            viewport: { width: 1920, height: 1080 },
+          },
+        },
       ],
   globalTeardown: "./global-teardown.ts",
 })
