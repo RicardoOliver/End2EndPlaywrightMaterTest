@@ -193,7 +193,9 @@ jobs:
           BASE_URL: ${{ vars.BASE_URL || secrets.BASE_URL || 'https://automationintesting.online/' }}
       - name: Generate k6 summary HTML
         run: |
-          node -e "const fs=require('fs'); const p='reports/k6-summary.json'; if(fs.existsSync(p)){ const data=fs.readFileSync(p,'utf8'); const html='<!doctype html><html><head><meta charset=\'utf-8\'><title>K6 Summary</title><style>body{font-family:system-ui,Arial,sans-serif;padding:20px;}pre{white-space:pre-wrap;word-wrap:break-word;background:#f6f8fa;padding:16px;border-radius:8px;border:1px solid #ddd;}h1{margin-top:0}</style></head><body><h1>K6 Summary</h1><pre>'+data+'</pre></body></html>'; fs.writeFileSync('reports/k6-summary.html', html); console.log('k6 summary HTML generated'); } else { console.log('k6 summary JSON not found'); }"
+          mkdir -p reports || true
+          chmod -R u+w reports || true
+          node -e "const fs=require('fs'); const path=require('path'); const p='reports/k6-summary.json'; if(fs.existsSync(p)){ const data=fs.readFileSync(p,'utf8'); const html='<!doctype html><html><head><meta charset=\'utf-8\'><title>K6 Summary</title><style>body{font-family:system-ui,Arial,sans-serif;padding:20px;}pre{white-space:pre-wrap;word-wrap:break-word;background:#f6f8fa;padding:16px;border-radius:8px;border:1px solid #ddd;}h1{margin-top:0}</style></head><body><h1>K6 Summary</h1><pre>'+data+'</pre></body></html>'; const out1=path.join('reports','k6-summary.html'); try { fs.writeFileSync(out1, html); console.log('k6 summary HTML generated at '+out1); } catch(e){ const tmp=process.env.RUNNER_TEMP || process.cwd(); const out2=path.join(tmp,'k6-summary.html'); fs.writeFileSync(out2, html); console.log('k6 summary HTML generated at '+out2+' (fallback)'); } } else { console.log('k6 summary JSON not found'); }"
       - name: Upload k6 summary HTML
         if: always()
         uses: actions/upload-artifact@v4
