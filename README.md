@@ -206,11 +206,12 @@ test('Meu teste', async ({ page }) => {
 - Vídeos dos testes
   - Os vídeos são anexados nos artefatos do GitHub Actions em `test-results` quando há falhas.
   - Para demonstrar no repositório, adicione um vídeo em `docs/media/demo.mp4` e use o link:
-    - [Assista ao vídeo de demonstração](docs/media/demo.mp4)
+    - Use o player abaixo ou abra diretamente:
+    - <video src="docs/media/demo.mp4" controls width="640"></video>
 
-- Dashboard Grafana (Performance)
+ - Dashboard Grafana (Performance)
   - Após executar `docker compose up -d influxdb grafana` e `npm run perf:k6`, capture o painel e salve em `docs/media/grafana-dashboard.png`.
-  - Visualização no README:
+  - Visualização:
     - ![Grafana Dashboard](docs/media/grafana-dashboard.png)
 
 ## 🌐 Site Testado
