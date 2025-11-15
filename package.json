@@ -25,7 +25,19 @@
     "notify": "node --loader ts-node/esm scripts/sendAllNotifications.ts",
     "report:allure": "allure generate allure-results -o reports/allure --clean",
     "report:allure:serve": "allure open reports/allure",
-    "perf:k6": "docker compose run --rm k6"
+    "perf:k6": "docker compose run --rm k6",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:portainer:up": "docker compose up -d portainer",
+    "docker:portainer:stop": "docker compose stop portainer",
+    "docker:portainer:rm": "docker compose rm -f portainer",
+    "docker:perf:start": "docker compose up -d influxdb grafana",
+    "docker:perf:stop": "docker compose stop grafana influxdb",
+    "docker:perf:logs": "docker compose logs -f grafana influxdb",
+    "docker:tests:run": "docker compose run --rm tests",
+    "docker:tests:logs": "docker compose logs -f tests",
+    "docker:reports": "echo Reports available in ./reports",
+    "docker:reset:volumes": "docker compose down -v"
     
   },
   "dependencies": {
