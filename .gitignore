@@ -11,6 +11,9 @@ downloads/
 allure-results/
 *.log
 
+influxdb/data/
+grafana/data/
+
 # Playwright
 playwright/.cache/
 .playwright/
