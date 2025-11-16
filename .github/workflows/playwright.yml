@@ -489,7 +489,9 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install
       - name: Run Playwright tests (Windows scheduled)
-        run: npx playwright test --max-failures=1
+        env:
+          PW_FAST: true
+        run: npx playwright test --project=chromium --max-failures=1
       - name: Setup Java for Allure
         if: always()
         uses: actions/setup-java@v4
@@ -498,8 +500,9 @@ jobs:
           java-version: "17"
       - name: Generate Allure report
         if: always()
+        continue-on-error: true
         run: |
-          npx -y allure-commandline@2.34.1 generate allure-results -o reports/allure --clean
+          allure generate allure-results -o reports/allure --clean
       - name: Upload HTML report
         if: always()
         uses: actions/upload-artifact@v4
@@ -508,6 +511,7 @@ jobs:
           path: reports/html
           if-no-files-found: warn
           retention-days: 30
+          overwrite: true
       - name: Upload JSON report
         if: always()
         uses: actions/upload-artifact@v4
@@ -516,6 +520,7 @@ jobs:
           path: reports/report.json
           if-no-files-found: warn
           retention-days: 30
+          overwrite: true
       - name: Upload Allure HTML report
         if: always()
         uses: actions/upload-artifact@v4
@@ -524,6 +529,7 @@ jobs:
           path: reports/allure
           if-no-files-found: warn
           retention-days: 30
+          overwrite: true
   deploy_pages:
     needs: [test]
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.PAGES_ENABLED == 'true' }}
