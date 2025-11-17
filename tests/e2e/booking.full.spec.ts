@@ -51,6 +51,16 @@ async function ensureAppReady(page: Page) {
   }
 }
 
+async function gotoSuite(page: Page): Promise<boolean> {
+  const reserve = () => page.getByRole('button', { name: /^reserve now$/i }).first()
+  for (const r of ['/reservation/3', '/#/reservation/3']) {
+    try { await page.goto(r, { waitUntil: 'domcontentloaded' }) } catch {}
+    await ensureAppReady(page)
+    if (await reserve().isVisible().catch(() => false)) return true
+  }
+  return false
+}
+
 async function openAndPickDate(page: Page, type: "checkin" | "checkout", date: Date) {
   const id = type === "checkin" ? "checkin" : "checkout"
   async function findDateInput(): Promise<import("@playwright/test").Locator | null> {
@@ -118,10 +128,12 @@ test.describe("E2E Avançado - Reserva completa", () => {
       }
     }
     if (!navigated) {
-      await page.goto('/reservation/3', { waitUntil: 'domcontentloaded' })
+      const ok = await gotoSuite(page)
+      if (!ok) {
+        await page.goto('/reservation/3', { waitUntil: 'domcontentloaded' })
+        await ensureAppReady(page)
+      }
     }
-    await page.waitForLoadState('domcontentloaded')
-    await ensureAppReady(page)
     const reserveBtn1 = page.getByRole('button', { name: /^reserve now$/i }).first()
     await expect(reserveBtn1).toBeVisible({ timeout: 20000 })
     await reserveBtn1.scrollIntoViewIfNeeded()
