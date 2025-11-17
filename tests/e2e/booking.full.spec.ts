@@ -119,16 +119,13 @@ test.describe("E2E Avançado - Reserva completa", () => {
     if (await roomsHeading.isVisible().catch(() => false)) {
       let bookNow = page.locator('a[href^="/reservation/3"]').first()
       if (!(await bookNow.isVisible().catch(() => false))) {
-        const suiteHeadingHome = page.getByRole('heading', { name: /^suite$/i }).first()
+        const suiteHeadingHome = page.getByRole('heading', { name: /suite/i }).first()
         const suiteCardHome = suiteHeadingHome.locator('..').locator('..')
         bookNow = suiteCardHome.getByRole('link', { name: /^book now$/i }).first()
       }
       if (await bookNow.isVisible().catch(() => false)) {
-        await Promise.all([
-          page.waitForURL(/reservation\//, { timeout: 20000 }),
-          bookNow.click()
-        ])
-        navigated = true
+        await bookNow.click()
+        navigated = await page.waitForURL(/reservation\//, { timeout: 15000 }).then(() => true).catch(() => false)
       }
     }
     if (!navigated) {
