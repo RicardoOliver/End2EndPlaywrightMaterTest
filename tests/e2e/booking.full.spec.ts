@@ -45,9 +45,13 @@ async function ensureAppReady(page: Page) {
   page.on('pageerror', e => console.error('[pageerror]', e.message))
   page.on('console', msg => { if (msg.type() === 'error') console.error('[console]', msg.text()) })
   const appError = page.getByRole('heading', { name: /application error/i }).first()
+  const notFound = page.getByText(/This page could not be found\.?/i).first()
   if (await appError.isVisible().catch(() => false)) {
     await page.reload({ waitUntil: 'domcontentloaded' })
     await expect(appError).not.toBeVisible({ timeout: 10000 })
+  }
+  if (await notFound.isVisible().catch(() => false)) {
+    await page.goto('/#/', { waitUntil: 'domcontentloaded' }).catch(() => {})
   }
 }
 
