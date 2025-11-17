@@ -97,7 +97,8 @@ test.describe("E2E Avançado - Reserva completa", () => {
       await openAndPickDate(page, "checkout", fixed)
     }
     const checkAvailability = page.getByRole('button', { name: /check availability/i }).first()
-    await checkAvailability.click().catch(() => {})
+    await expect(checkAvailability).toBeVisible({ timeout: 15000 })
+    await checkAvailability.click()
     // Passo 2: navegar para a Suite de forma resiliente
     let navigated = false
     const roomsHeading = page.getByRole('heading', { name: /our rooms/i }).first()
