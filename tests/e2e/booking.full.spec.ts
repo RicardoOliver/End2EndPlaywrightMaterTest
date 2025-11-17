@@ -53,7 +53,7 @@ async function ensureAppReady(page: Page) {
 
 async function gotoSuite(page: Page): Promise<boolean> {
   const reserve = () => page.getByRole('button', { name: /^reserve now$/i }).first()
-  for (const r of ['/reservation/3', '/#/reservation/3']) {
+  for (const r of ['/#/reservation/3', '/reservation/3']) {
     try { await page.goto(r, { waitUntil: 'domcontentloaded' }) } catch {}
     await ensureAppReady(page)
     if (await reserve().isVisible().catch(() => false)) return true
