@@ -150,6 +150,21 @@ jobs:
           distribution: temurin
           java-version: "17"
 
+      - name: Restore Allure history (Linux)
+        uses: actions/cache/restore@v4
+        with:
+          path: allure-results/history
+          key: allure-history-${{ github.ref }}
+          restore-keys: |
+            allure-history-
+
+      - name: Copy categories.json if present (Linux)
+        run: |
+          if [ -f allure/categories.json ]; then
+            mkdir -p allure-results
+            cp allure/categories.json allure-results/categories.json
+          fi
+
       - name: Generate Allure report
         if: always()
         run: |
@@ -170,6 +185,21 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
           overwrite: true
+
+      - name: Prepare Allure history for cache (Linux)
+        if: always()
+        run: |
+          mkdir -p allure-results/history
+          if [ -d reports/allure/history ]; then
+            cp -r reports/allure/history/. allure-results/history/
+          fi
+
+      - name: Save Allure history cache (Linux)
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: allure-results/history
+          key: allure-history-${{ github.ref }}
 
       - name: Upload Allure report to Pages artifact
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.node == 20 && matrix.shard == '1/2' }}
@@ -509,6 +539,21 @@ jobs:
         continue-on-error: true
         run: |
           npm run report:allure
+
+      - name: Restore Allure history (Windows)
+        uses: actions/cache/restore@v4
+        with:
+          path: allure-results/history
+          key: allure-history-${{ github.ref }}
+          restore-keys: |
+            allure-history-
+
+      - name: Copy categories.json if present (Windows)
+        run: |
+          if (Test-Path 'allure/categories.json') {
+            New-Item -ItemType Directory -Force -Path 'allure-results' | Out-Null
+            Copy-Item 'allure/categories.json' 'allure-results/categories.json' -Force
+          }
       - name: Add Allure local serve helper (Windows)
         if: always()
         run: |
@@ -541,6 +586,21 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
           overwrite: true
+
+      - name: Prepare Allure history for cache (Windows)
+        if: always()
+        run: |
+          New-Item -ItemType Directory -Force -Path 'allure-results/history' | Out-Null
+          if (Test-Path 'reports/allure/history') {
+            Copy-Item -Recurse -Force 'reports/allure/history/*' 'allure-results/history/'
+          }
+
+      - name: Save Allure history cache (Windows)
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: allure-results/history
+          key: allure-history-${{ github.ref }}
   deploy_pages:
     needs: [test]
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.PAGES_ENABLED == 'true' }}
