@@ -643,3 +643,13 @@ jobs:
             -Dsonar.sources=.
             -Dsonar.exclusions=**/node_modules/**,reports/**,test-results/**,.github/**,playwright-report/**,dist/**,build/**
             -Dsonar.test.inclusions=tests/**/*
+
+      - name: Sonar Quality Gate
+        id: sonar-quality-gate
+        uses: SonarSource/sonarqube-quality-gate-action@v1.1.0
+        if: ${{ env.SONAR_TOKEN != '' && vars.SONAR_ORG != '' && vars.SONAR_PROJECT_KEY != '' }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
+        with:
+          pollingTimeoutSec: 600
