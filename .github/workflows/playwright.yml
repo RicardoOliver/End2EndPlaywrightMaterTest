@@ -502,7 +502,7 @@ jobs:
         if: always()
         continue-on-error: true
         run: |
-          allure generate allure-results -o reports/allure --clean
+          npx allure-commandline generate allure-results -o reports/allure --clean
       - name: Upload HTML report
         if: always()
         uses: actions/upload-artifact@v4
