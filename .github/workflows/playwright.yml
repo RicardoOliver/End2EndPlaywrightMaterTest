@@ -543,7 +543,7 @@ jobs:
           overwrite: true
   deploy_pages:
     needs: [test]
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.PAGES_ENABLED == 'true' }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
