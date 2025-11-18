@@ -173,7 +173,7 @@ jobs:
 
       - name: Upload Allure report to Pages artifact
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.node == 20 && matrix.shard == '1/2' }}
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: reports/allure
 
