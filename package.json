@@ -25,7 +25,6 @@
     "notify": "node --loader ts-node/esm scripts/sendAllNotifications.ts",
     "report:allure": "npx allure-commandline generate allure-results -o reports/allure --clean",
     "report:allure:serve": "npx allure-commandline open reports/allure",
-    "report:allure:serve": "allure open reports/allure",
     "perf:k6": "docker compose run --rm k6",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
