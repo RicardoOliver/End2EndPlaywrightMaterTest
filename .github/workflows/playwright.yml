@@ -645,7 +645,7 @@ jobs:
             -Dsonar.test.inclusions=tests/**/*
 
       - name: Sonar Quality Gate
-        id: sonar-quality-gate
+        id: qg
         uses: SonarSource/sonarqube-quality-gate-action@v1.1.0
         if: ${{ env.SONAR_TOKEN != '' && vars.SONAR_ORG != '' && vars.SONAR_PROJECT_KEY != '' }}
         env:
@@ -657,7 +657,7 @@ jobs:
       - name: Echo Quality Gate status
         if: ${{ env.SONAR_TOKEN != '' && vars.SONAR_ORG != '' && vars.SONAR_PROJECT_KEY != '' }}
         run: |
-          echo "Sonar Quality Gate status: ${{ steps['sonar-quality-gate'].outputs['quality-gate-status'] }}"
+          echo "Sonar Quality Gate status: ${{ steps.qg.outputs.quality-gate-status }}"
 
       - name: Comment Quality Gate on PR
         if: ${{ github.event_name == 'pull_request' && env.SONAR_TOKEN != '' && vars.SONAR_ORG != '' && vars.SONAR_PROJECT_KEY != '' }}
@@ -665,7 +665,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const status = '${{ steps["sonar-quality-gate"].outputs["quality-gate-status"] }}';
+            const status = '${{ steps.qg.outputs.quality-gate-status }}';
             const body = `Sonar Quality Gate: ${status}`;
             await github.rest.issues.createComment({
               owner: context.repo.owner,
