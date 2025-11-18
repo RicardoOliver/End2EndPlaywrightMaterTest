@@ -154,6 +154,12 @@ jobs:
         if: always()
         run: |
           npm run report:allure
+      - name: Add Allure local serve helper (Linux)
+        if: always()
+        run: |
+          mkdir -p reports/allure || true
+          printf '#!/usr/bin/env bash\n\nnpx allure-commandline open reports/allure\n' > reports/allure/open.sh
+          chmod +x reports/allure/open.sh
 
       - name: Upload Allure HTML report
         if: always()
@@ -503,6 +509,11 @@ jobs:
         continue-on-error: true
         run: |
           npm run report:allure
+      - name: Add Allure local serve helper (Windows)
+        if: always()
+        run: |
+          $content = "npx allure-commandline open reports/allure"
+          New-Item -ItemType File -Force -Path "reports/allure/open.ps1" -Value $content
       - name: Upload HTML report
         if: always()
         uses: actions/upload-artifact@v4
@@ -532,7 +543,7 @@ jobs:
           overwrite: true
   deploy_pages:
     needs: [test]
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.PAGES_ENABLED == 'true' }}
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
