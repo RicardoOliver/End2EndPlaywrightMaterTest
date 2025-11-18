@@ -195,11 +195,11 @@ jobs:
           fi
 
       - name: Save Allure history cache (Linux)
-        if: always()
+        if: ${{ matrix.shard == '2/2' && matrix.node == 20 }}
         uses: actions/cache/save@v4
         with:
           path: allure-results/history
-          key: allure-history-${{ github.ref }}
+          key: allure-history-${{ github.ref }}-${{ matrix.os }}-node${{ matrix.node }}-shard${{ env.SHARD_NAME }}
 
       - name: Upload Allure report to Pages artifact
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.node == 20 && matrix.shard == '1/2' }}
@@ -596,11 +596,11 @@ jobs:
           }
 
       - name: Save Allure history cache (Windows)
-        if: always()
+        if: ${{ matrix.node == 20 }}
         uses: actions/cache/save@v4
         with:
           path: allure-results/history
-          key: allure-history-${{ github.ref }}
+          key: allure-history-${{ github.ref }}-windows-node${{ matrix.node }}
   deploy_pages:
     needs: [test]
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.PAGES_ENABLED == 'true' }}
