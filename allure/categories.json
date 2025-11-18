@@ -8,7 +8,7 @@
   {
     "name": "Test defects",
     "matchedStatuses": ["failed"],
-    "messageRegex": "Timeout.*exceeded|locator.*not.*visible|No\s?such\s?element|TypeError|ReferenceError",
+    "messageRegex": "Timeout.*exceeded|locator.*not.*visible|No\\s?such\\s?element|TypeError|ReferenceError",
     "traceRegex": "Error:.*(Timeout|locator|expect)"
   },
   {
