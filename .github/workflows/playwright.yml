@@ -612,3 +612,30 @@ jobs:
       - name: Deploy Allure to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  sonarcloud_scan:
+    name: SonarCloud Scan
+    needs: [test]
+    if: ${{ (github.event_name == 'push' || github.event_name == 'pull_request') && secrets.SONAR_TOKEN != '' && vars.SONAR_ORG != '' && vars.SONAR_PROJECT_KEY != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
+            -Dsonar.organization=${{ vars.SONAR_ORG }}
+            -Dsonar.sources=.
+            -Dsonar.exclusions=**/node_modules/**,reports/**,test-results/**,.github/**,playwright-report/**,dist/**,build/**
+            -Dsonar.test.inclusions=tests/**/*
