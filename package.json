@@ -20,7 +20,7 @@
     "test:fast": "set FAST=true&& npx playwright test",
     "test:parallel": "npx playwright test --workers=4",
     "test:serial": "npx playwright test --workers=1",
-    "test:coverage": "nyc --reporter=lcov --reporter=text npx playwright test --project=chromium --workers=1",
+    "test:coverage": "c8 --reporter=lcov --reporter=text --all --include=pages --include=utils --include=notifiers npx playwright test --project=chromium --workers=1",
     "codegen": "npx playwright codegen https://automationintesting.online/#/",
     "install:browsers": "npx playwright install",
     "notify": "node --loader ts-node/esm scripts/sendAllNotifications.ts",
@@ -53,34 +53,14 @@
     "@types/nodemailer": "^6.4.16",
     "allure-commandline": "^2.34.1",
     "allure-playwright": "^2.0.0",
-    "nyc": "^15.1.0",
+    "c8": "^10.1.2",
     "ts-node": "^10.9.2",
     "typescript": "^5"
   },
   "engines": {
     "node": ">=18.0.0"
   }
-  ,
-  "nyc": {
-    "extension": [".ts", ".js"],
-    "all": true,
-    "include": [
-      "pages/**",
-      "utils/**",
-      "notifiers/**"
-    ],
-    "exclude": [
-      "tests/**",
-      "reports/**",
-      "playwright.config.ts",
-      "global-teardown.ts",
-      "performance/**",
-      "influxdb/**",
-      "docker/**"
-    ],
-    "reporter": ["lcov", "text"],
-    "sourceMap": true
-  }
+  
 }
 
 
