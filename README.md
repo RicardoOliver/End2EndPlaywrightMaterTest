@@ -1,6 +1,6 @@
 # 🎭 Playwright Testing Framework
 
-[![Visitantes](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FRicardoOliver%2FEnd2EndPlaywrightMaterTest&count_bg=%23FF69B4&title_bg=%23555555&icon=github.svg&icon_color=%23FFFFFF&title=VISITANTES&edge_flat=true)](https://hits.seeyoufarm.com)
+![VISITANTES](https://visitor-badge.laobi.icu/badge?page_id=RicardoOliver.End2EndPlaywrightMaterTest&left_text=VISITANTES)
 
 Framework completo de testes E2E com Playwright para o site [Automation In Testing](https://automationintesting.online/).
 
