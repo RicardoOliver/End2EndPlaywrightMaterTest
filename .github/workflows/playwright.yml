@@ -634,6 +634,15 @@ jobs:
         run: npx playwright install
       - name: Generate coverage (lcov)
         run: npm run test:coverage
+      - name: Upload coverage HTML artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: coverage
+          if-no-files-found: warn
+          retention-days: 7
+          overwrite: true
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
