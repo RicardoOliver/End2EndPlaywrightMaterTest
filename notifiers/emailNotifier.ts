@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer"
-import fs from "fs"
-import path from "path"
+import fs from "node:fs"
+import path from "node:path"
 import dotenv from "dotenv"
 // @ts-ignore
 import archiver from "archiver"

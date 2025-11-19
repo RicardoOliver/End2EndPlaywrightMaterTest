@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test"
 import { ContactPage } from "../../pages/contact.page"
-import fs from "fs"
-import path from "path"
+import fs from "node:fs"
+import path from "node:path"
 
 test.describe("E2E - Contact form submission", () => {
   test("Submit contact form with valid data", async ({ page }) => {
