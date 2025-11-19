@@ -175,12 +175,18 @@ jobs:
           npm ci || npm install --no-fund --no-audit
           npx playwright install --with-deps
           npm run test:coverage
+          npx c8 report --reporter=json-summary
       - name: Copy coverage into Allure for Pages (Linux)
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.node == 20 && matrix.shard == '1/2' }}
         run: |
-          if [ -d coverage ]; then
-            mkdir -p reports/allure/coverage
-            cp -r coverage/. reports/allure/coverage/
+          if [ -d coverage ] && [ -f coverage/coverage-summary.json ]; then
+            PCT=$(node -e "const s=require('./coverage/coverage-summary.json'); console.log(Math.floor(s.total.statements.pct))")
+            if [ "$PCT" -ge 70 ]; then
+              mkdir -p reports/allure/coverage
+              cp -r coverage/. reports/allure/coverage/
+            else
+              echo "Skipping coverage publish: $PCT% < 70%"
+            fi
           fi
       - name: Add coverage link into Allure index (Linux)
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.node == 20 && matrix.shard == '1/2' }}
@@ -655,6 +661,11 @@ jobs:
         run: npx playwright install
       - name: Generate coverage (lcov)
         run: npm run test:coverage
+      - name: Generate coverage summary JSON
+        run: npx c8 report --reporter=json-summary
+      - name: Enforce coverage threshold (>=70%)
+        run: |
+          node -e "const fs=require('fs'); const p='coverage/coverage-summary.json'; if(!fs.existsSync(p)){ console.error('coverage-summary.json not found'); process.exit(1); } const s=JSON.parse(fs.readFileSync(p,'utf8')); const pct=s.total.statements.pct; console.log('Statements coverage:', pct); if (pct < 70) { console.error('Coverage below threshold (70%)'); process.exit(1); }"
       - name: Upload coverage HTML artifact
         if: always()
         uses: actions/upload-artifact@v4
