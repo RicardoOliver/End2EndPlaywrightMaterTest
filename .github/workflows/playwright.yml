@@ -534,12 +534,6 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
-      - name: Generate Allure report
-        if: always()
-        continue-on-error: true
-        run: |
-          npm run report:allure
-
       - name: Restore Allure history (Windows)
         uses: actions/cache/restore@v4
         with:
@@ -554,6 +548,12 @@ jobs:
             New-Item -ItemType Directory -Force -Path 'allure-results' | Out-Null
             Copy-Item 'allure/categories.json' 'allure-results/categories.json' -Force
           }
+
+      - name: Generate Allure report
+        if: always()
+        continue-on-error: true
+        run: |
+          npm run report:allure
       - name: Add Allure local serve helper (Windows)
         if: always()
         run: |
