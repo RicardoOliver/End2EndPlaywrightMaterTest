@@ -169,6 +169,19 @@ jobs:
         if: always()
         run: |
           npm run report:allure
+      - name: Generate coverage for Pages (Linux)
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.node == 20 && matrix.shard == '1/2' }}
+        run: |
+          npm ci || npm install --no-fund --no-audit
+          npx playwright install --with-deps
+          npm run test:coverage
+      - name: Copy coverage into Allure for Pages (Linux)
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.node == 20 && matrix.shard == '1/2' }}
+        run: |
+          if [ -d coverage ]; then
+            mkdir -p reports/allure/coverage
+            cp -r coverage/. reports/allure/coverage/
+          fi
       - name: Add Allure local serve helper (Linux)
         if: always()
         run: |
