@@ -705,11 +705,10 @@ jobs:
         id: qg
         uses: SonarSource/sonarqube-quality-gate-action@v1.1.0
         if: ${{ env.SONAR_TOKEN != '' && vars.SONAR_ORG != '' && vars.SONAR_PROJECT_KEY != '' }}
+        timeout-minutes: 10
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io
-        with:
-          scanMetadataReportFile: ${{ steps.sonarcloud_scan.outputs.scanMetadataReportFile }}
 
       - name: Echo Quality Gate status
         if: ${{ env.SONAR_TOKEN != '' && vars.SONAR_ORG != '' && vars.SONAR_PROJECT_KEY != '' }}
