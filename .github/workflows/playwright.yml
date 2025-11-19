@@ -624,6 +624,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm ci || npm install --no-fund --no-audit
+      - name: Install Playwright Browsers (for coverage)
+        run: npx playwright install
+      - name: Generate coverage (lcov)
+        run: npm run test:coverage
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -643,6 +653,7 @@ jobs:
             -Dsonar.sources=.
             -Dsonar.exclusions=**/node_modules/**,reports/**,test-results/**,.github/**,playwright-report/**,dist/**,build/**
             -Dsonar.test.inclusions=tests/**/*
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
 
       - name: Sonar Quality Gate
         id: qg

@@ -9,6 +9,7 @@ playwright-report/
 reports/
 downloads/
 allure-results/
+coverage/
 *.log
 
 influxdb/data/
