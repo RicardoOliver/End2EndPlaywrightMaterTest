@@ -227,3 +227,9 @@ Site de demonstração (Shady Meadows B&B) com:
 
 - [CHANGELOG.md](./CHANGELOG.md) - Histórico de versões
 - [CONFIGURACAO_EMAIL.md](./CONFIGURACAO_EMAIL.md) - Configuração de email e comportamento do teardown
+
+  ## 🧮 Contador de Visitantes  
+
+<p align="center">
+  <img src="https://komarev.com/ghpvc/?username=RicardoOliver/End2EndPlaywrightMaterTest/edit/main/README.md&color=ff69b4&style=for-the-badge&label=VISITANTES" alt="Contador de visitantes"/>
+</p>
