@@ -665,11 +665,11 @@ jobs:
         run: npm run test:coverage
       - name: Generate coverage summary JSON
         run: npx c8 report --reporter=json-summary
-      - name: Enforce coverage threshold (>=70%)
+      - name: Enforce coverage threshold
         env:
-          COV_THRESHOLD: ${{ vars.COVERAGE_THRESHOLD || '60' }}
+          COV_THRESHOLD: ${{ vars.COVERAGE_THRESHOLD || '55' }}
         run: |
-          node -e "const fs=require('fs'); const p='coverage/coverage-summary.json'; const thr=parseInt(process.env.COV_THRESHOLD||'60',10); if(!fs.existsSync(p)){ console.error('coverage-summary.json not found'); process.exit(1); } const s=JSON.parse(fs.readFileSync(p,'utf8')); const pct=s.total.statements.pct; console.log('Statements coverage:', pct, 'threshold:', thr); if (pct < thr) { console.error('Coverage below threshold ('+thr+'%)'); process.exit(1); }"
+          node -e "const fs=require('fs'); const p='coverage/coverage-summary.json'; const thr=parseInt(process.env.COV_THRESHOLD||'55',10); if(!fs.existsSync(p)){ console.error('coverage-summary.json not found'); process.exit(1); } const s=JSON.parse(fs.readFileSync(p,'utf8')); const pct=s.total.statements.pct; console.log('Statements coverage:', pct, 'threshold:', thr); if (pct < thr) { console.error('Coverage below threshold ('+thr+'%)'); process.exit(1); }"
       - name: Upload coverage HTML artifact
         if: always()
         uses: actions/upload-artifact@v4

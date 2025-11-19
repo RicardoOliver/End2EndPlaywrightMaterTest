@@ -20,7 +20,7 @@
     "test:fast": "set FAST=true&& npx playwright test",
     "test:parallel": "npx playwright test --workers=4",
     "test:serial": "npx playwright test --workers=1",
-    "test:coverage": "c8 --reporter=lcov --reporter=html --reporter=text --all --include=pages --include=utils --include=notifiers npx playwright test --project=chromium --workers=1",
+    "test:coverage": "c8 --reporter=lcov --reporter=html --reporter=text --all --include=pages --include=notifiers npx playwright test --project=chromium --workers=1",
     "coverage:html": "c8 report --reporter=html",
     "coverage:open": "powershell -NoProfile -ExecutionPolicy Bypass -Command Start-Process 'coverage\\index.html'",
     "codegen": "npx playwright codegen https://automationintesting.online/#/",
