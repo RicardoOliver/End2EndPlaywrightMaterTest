@@ -182,6 +182,14 @@ jobs:
             mkdir -p reports/allure/coverage
             cp -r coverage/. reports/allure/coverage/
           fi
+      - name: Add coverage link into Allure index (Linux)
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.node == 20 && matrix.shard == '1/2' }}
+        run: |
+          IDX="reports/allure/index.html"
+          if [ -f "$IDX" ]; then
+            cp "$IDX" "$IDX.bak"
+            sed -e "s#</body>#<div style='position:fixed;bottom:16px;right:16px;z-index:9999'><a href='coverage/index.html' style='background:#0366d6;color:#fff;padding:8px 12px;border-radius:6px;text-decoration:none;font-family:system-ui,Arial,sans-serif'>Coverage Report</a></div></body>#" "$IDX.bak" > "$IDX" || mv "$IDX.bak" "$IDX"
+          fi
       - name: Add Allure local serve helper (Linux)
         if: always()
         run: |
