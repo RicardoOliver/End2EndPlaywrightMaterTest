@@ -685,6 +685,7 @@ jobs:
           distribution: temurin
           java-version: "17"
       - name: SonarCloud Scan
+        id: sonarcloud_scan
         uses: SonarSource/sonarqube-scan-action@v5.0.0
         if: ${{ env.SONAR_TOKEN != '' && vars.SONAR_ORG != '' && vars.SONAR_PROJECT_KEY != '' }}
         env:
@@ -708,7 +709,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io
         with:
-          pollingTimeoutSec: 600
+          scanMetadataReportFile: ${{ steps.sonarcloud_scan.outputs.scanMetadataReportFile }}
 
       - name: Echo Quality Gate status
         if: ${{ env.SONAR_TOKEN != '' && vars.SONAR_ORG != '' && vars.SONAR_PROJECT_KEY != '' }}
