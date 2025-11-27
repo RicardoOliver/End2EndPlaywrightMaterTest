@@ -143,6 +143,28 @@ Pipeline GitHub Actions configurado em `.github/workflows/playwright.yml`
 - `BASE_URL` para performance (vars/secrets)
 - `EMAIL_*`, `SLACK_TOKEN`, `SLACK_CHANNEL`, `TEAMS_WEBHOOK`
 
+### Integração SonarCloud
+- Executa `SonarCloud Scan` em `push`, `pull_request` e `schedule`.
+- Quality Gate verificado com ação oficial; falha do gate interrompe o pipeline.
+- Cobertura gerada com `c8` e lcov, enviada ao SonarCloud.
+- Limite de cobertura configurável via `vars.COVERAGE_THRESHOLD` (padrão `55`).
+- Requisitos:
+  - `secrets.SONAR_TOKEN`
+  - `vars.SONAR_ORG`
+  - `vars.SONAR_PROJECT_KEY`
+
+### Publicação no GitHub Pages
+- Job `deploy_pages` publica Allure no GitHub Pages.
+- Roda em `push` no `main` e também em `schedule`.
+- Controlado por `vars.PAGES_ENABLED == 'true'`.
+- Ambiente: `github-pages` com URL automática no workflow.
+
+### Schedule
+- Execuções agendadas disparam:
+  - Matriz `test`
+  - `sonarcloud_scan`
+  - `deploy_pages` (se `PAGES_ENABLED` ativado)
+
 ## 📝 Adicionar Novos Testes
 
 1. **Criar Page Object** em `pages/`:
