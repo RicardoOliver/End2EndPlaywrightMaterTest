@@ -632,7 +632,7 @@ jobs:
           key: allure-history-${{ github.ref }}-windows-node${{ matrix.node }}
   deploy_pages:
     needs: [test]
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.PAGES_ENABLED == 'true' }}
+    if: ${{ (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main' && vars.PAGES_ENABLED == 'true' }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -645,7 +645,7 @@ jobs:
   sonarcloud_scan:
     name: SonarCloud Scan
     needs: [test]
-    if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
+    if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'schedule' }}
     runs-on: ubuntu-latest
     env:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
