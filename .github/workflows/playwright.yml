@@ -231,7 +231,7 @@ jobs:
           key: allure-history-${{ github.ref }}-${{ matrix.os }}-node${{ matrix.node }}-shard${{ env.SHARD_NAME }}
 
       - name: Upload Allure report to Pages artifact
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.node == 20 && matrix.shard == '1/2' }}
+        if: ${{ (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main' && matrix.node == 20 && matrix.shard == '1/2' }}
         uses: actions/upload-pages-artifact@v4
         with:
           path: reports/allure
