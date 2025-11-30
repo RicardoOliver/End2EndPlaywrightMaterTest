@@ -165,6 +165,23 @@ Pipeline GitHub Actions configurado em `.github/workflows/playwright.yml`
   - `sonarcloud_scan`
   - `deploy_pages` (se `PAGES_ENABLED` ativado)
 
+### Entendendo os pipelines
+- Matriz de testes: roda em `ubuntu-latest` com Node `20` e `22`, usando sharding (`1/2` e `2/2`) para paralelizar.
+- Sharding: são 2 shards; para cobrir 100% dos testes, ambos precisam executar.
+- SonarCloud: executa em `push`, `pull_request` e `schedule` e aplica Quality Gate.
+- GitHub Pages: precisa de apenas um artifact chamado `github-pages` no mesmo run.
+- Upload do Pages artifact: feito em um único job da matriz (`Node 20`, `shard 1/2`) e habilitado também para `schedule`.
+- Deploy Pages: consome o artifact `github-pages` e publica o Allure.
+
+### Por que às vezes há 4 jobs de `test`?
+- A matriz combina Node (`20` e `22`) e shard (`1/2` e `2/2`). Isso resulta em 4 execuções.
+- Essa estratégia garante compatibilidade entre versões de Node e acelera a suíte completa via paralelização.
+
+### O que é suficiente para o agendado?
+- Para publicar no Pages, basta um único artifact `github-pages` — não é necessário gerar em todos os jobs.
+- Para executar 100% dos testes, mantenha os dois shards. Você pode reduzir para apenas Node `20` no `schedule` para economia.
+- Alternativa simples: desativar sharding no `schedule` e subir o Pages após uma única execução (mais lento, porém direto).
+
 ## 📝 Adicionar Novos Testes
 
 1. **Criar Page Object** em `pages/`:
